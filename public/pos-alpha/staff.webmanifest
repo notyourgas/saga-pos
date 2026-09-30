@@ -1,0 +1,22 @@
+{
+  "id": "/staff",
+  "name": "SagaPOS Staff",
+  "short_name": "SagaPOS",
+  "description": "Portal karyawan SagaPOS untuk jadwal, absensi, pengajuan, dan penerimaan barang.",
+  "lang": "id-ID",
+  "start_url": "/staff?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f3ef",
+  "theme_color": "#6f3f2f",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/staff-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

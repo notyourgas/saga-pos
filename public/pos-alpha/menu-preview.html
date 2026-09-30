@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f6f0e7">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Kopi Saga · Katalog Menu</title>
+  <link rel="stylesheet" href="/menu-preview.css">
+  <link rel="stylesheet" href="/menu-reference-v2.css">
+  <link rel="stylesheet" href="/reference-parity-v3.css">
+  <link rel="stylesheet" href="/kopisaga-brand-v4.css">
+</head>
+<body>
+  <a class="skip-link" href="#catalog">Lewati ke katalog</a>
+  <img id="catalog-hero-image" class="catalog-hero-image-bootstrap" src="/assets/menu/v1/americano-v1.svg" alt="" width="640" height="640" sizes="(min-width:1024px) 430px,(min-width:600px) 40vw,90vw" fetchpriority="high" decoding="async" aria-hidden="true">
+  <header class="site-header">
+    <a class="wordmark" href="/menu" aria-label="Kopi Saga, halaman menu"><img src="/assets/brand/kopi-saga-logo-cream-v1.svg" alt="Kopi Saga" width="1087" height="850"></a>
+    <nav class="primary-nav" aria-label="Navigasi katalog">
+      <a href="/menu" data-nav="menu">Menu</a>
+      <a href="/menu/promo" data-nav="promo">Promo</a>
+      <a href="/menu/member" data-nav="member">Saga Member</a>
+    </nav>
+    <div class="header-context" aria-label="Informasi kedai"><span id="header-hours">Jam layanan</span><span class="header-location" id="header-location">⌖ Kopi Saga</span></div>
+    <div class="header-actions"><a class="header-search" href="#catalog-search" aria-label="Cari menu"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></a><a class="member-pill" href="/menu/member">SAGA MEMBER</a></div>
+    <span class="surface-pill" id="surface-pill">E-CATALOGUE</span>
+  </header>
+  <p class="catalog-scope-note" role="status">E-katalog lihat-saja · pemesanan tersedia melalui kiosk dan QR meja.</p>
+  <main id="catalog" tabindex="-1" aria-live="polite">
+    <section class="loading-state" aria-label="Memuat katalog">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Menyiapkan menu Kopi Saga…</p>
+    </section>
+  </main>
+  <dialog id="product-dialog" class="product-dialog" aria-labelledby="dialog-title" aria-modal="true">
+    <div id="dialog-content"></div>
+  </dialog>
+  <div id="network-status" class="network-status" role="status" hidden></div>
+  <script type="module" src="/menu-preview.js"></script>
+</body>
+</html>

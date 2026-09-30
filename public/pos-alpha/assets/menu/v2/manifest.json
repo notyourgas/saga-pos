@@ -1,0 +1,68 @@
+{
+  "version": 2,
+  "generatedWith": "Original synthetic SVG placeholder generation",
+  "reviewContract": "Clearly synthetic labeled vector placeholders for development; no original menu photography or generated reference imagery redistributed.",
+  "dimensions": {
+    "width": 640,
+    "height": 640,
+    "format": "SVG"
+  },
+  "assetBudgetBytes": 700000,
+  "illustrativeDummyAssets": [
+    {
+      "productId": "es-kopi-saga",
+      "file": "es-kopi-saga-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    },
+    {
+      "productId": "saga-premiyum",
+      "file": "saga-premiyum-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    },
+    {
+      "productId": "magnosiyum",
+      "file": "magnosiyum-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    },
+    {
+      "productId": "brr-patabim",
+      "file": "brr-patabim-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    },
+    {
+      "productId": "tralalelow",
+      "file": "tralalelow-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    },
+    {
+      "productId": "si-biyu",
+      "file": "si-biyu-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    },
+    {
+      "productId": "oyen-sunkist",
+      "file": "oyen-sunkist-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    },
+    {
+      "productId": "mohito",
+      "file": "mohito-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    },
+    {
+      "productId": "range-bliss",
+      "file": "range-bliss-dummy-v1.svg",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER"
+    }
+  ],
+  "fallbackAssets": []
+}

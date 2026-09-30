@@ -1,0 +1,229 @@
+/* 32-inch portrait kiosk: native 1080x1920, OS scaling 100%. The catalogue is
+   the only scrolling step; transaction steps stay inside the physical viewport. */
+body[data-order-surface="kiosk"] {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body[data-order-surface="kiosk"] .topbar {
+  position: relative;
+  min-height: 86px;
+  padding: 12px 48px;
+}
+
+body[data-order-surface="kiosk"] .demo-banner {
+  min-height: 34px;
+  display: grid;
+  place-items: center;
+}
+
+body[data-order-surface="kiosk"] main {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  min-height: 0;
+  padding: 32px 48px 38px;
+  overflow: hidden;
+}
+
+body[data-order-surface="kiosk"] main[data-screen="menu"] {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 164px;
+  scrollbar-color: var(--walnut) transparent;
+}
+
+body[data-order-surface="kiosk"] main[data-screen="menu"] .catalog-toolbar {
+  top: 0;
+  margin-bottom: 26px;
+  padding-top: 16px;
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell,
+body[data-order-surface="kiosk"] .review {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell .order-hero {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  margin: 0;
+  padding: clamp(44px, 6vh, 100px) clamp(44px, 6vw, 72px);
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell .order-hero-copy {
+  align-self: end;
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell .order-hero h1 {
+  max-width: 10ch;
+  font-size: clamp(76px, 9vw, 112px);
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell .order-hero p {
+  max-width: 40ch;
+  font-size: 19px;
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell .order-hero-art {
+  min-height: 0;
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell .hero-product {
+  width: min(54vw, 520px);
+  max-width: none;
+  height: 90%;
+}
+
+body[data-order-surface="kiosk"] .kiosk-flow-shell .hero-product-1 { right: 0; }
+body[data-order-surface="kiosk"] .kiosk-flow-shell .hero-product-2 { right: 38%; }
+body[data-order-surface="kiosk"] .kiosk-flow-shell .kiosk-flow-actions .primary {
+  min-width: 320px;
+  min-height: 76px;
+  font-size: 21px;
+}
+
+body[data-order-surface="kiosk"] .flow-progress {
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+body[data-order-surface="kiosk"] .flow-back {
+  align-self: flex-start;
+  min-width: 180px;
+}
+
+body[data-order-surface="kiosk"] .flow-heading {
+  max-width: 860px;
+  margin: clamp(38px, 5vh, 88px) 0 clamp(30px, 5vh, 80px);
+}
+
+body[data-order-surface="kiosk"] .flow-heading > p:last-child {
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+body[data-order-surface="kiosk"] .flow-choice-grid,
+body[data-order-surface="kiosk"] .member-grid {
+  flex: 1;
+  align-content: start;
+  gap: 24px;
+}
+
+body[data-order-surface="kiosk"] .flow-choice {
+  min-height: min(35vh, 560px);
+  padding: 36px;
+}
+
+body[data-order-surface="kiosk"] .flow-choice strong { font-size: 54px; }
+body[data-order-surface="kiosk"] .flow-choice span { font-size: 18px; }
+
+body[data-order-surface="kiosk"] .member-card {
+  min-height: 420px;
+  padding: 32px;
+}
+
+body[data-order-surface="kiosk"] .member-card p { font-size: 18px; }
+body[data-order-surface="kiosk"] .member-card button { min-height: 72px; }
+body[data-order-surface="kiosk"] .member-card input { font-size: 20px; }
+body[data-order-surface="kiosk"] .kiosk-flow-shell > .kiosk-flow-actions { margin-top: auto; padding-bottom: 24px; }
+body[data-order-surface="kiosk"] .kiosk-flow-shell > .kiosk-flow-actions .primary,
+body[data-order-surface="kiosk"] .kiosk-flow-shell > .kiosk-flow-actions .secondary-action { min-height: 72px; }
+
+body[data-order-surface="kiosk"] .review {
+  display: flex;
+  flex-direction: column;
+  max-width: 860px;
+  gap: clamp(16px, 2vh, 30px);
+  padding-top: clamp(18px, 3vh, 56px);
+}
+
+body[data-order-surface="kiosk"] .review h1 {
+  max-width: 13ch;
+  font-size: clamp(60px, 7vw, 82px);
+  line-height: .94;
+}
+
+body[data-order-surface="kiosk"] .review > div:first-child > p:last-child { font-size: 20px; }
+body[data-order-surface="kiosk"] .review-card { padding: 22px 28px; }
+body[data-order-surface="kiosk"] .review-line { align-items: start; font-size: 19px; }
+body[data-order-surface="kiosk"] .review-line small { display: block; color: var(--muted); font-size: 15px; }
+body[data-order-surface="kiosk"] .review-total { font-size: 26px; }
+body[data-order-surface="kiosk"] .notice { margin: 0; padding: 18px 22px; font-size: 17px; }
+body[data-order-surface="kiosk"] .review .actions { margin-top: auto; padding-bottom: 12px; }
+body[data-order-surface="kiosk"] .review .actions button { min-height: 72px; font-size: 18px; }
+
+body[data-order-surface="kiosk"] .review-pages {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+body[data-order-surface="kiosk"] .review-pages button { min-height: 64px; }
+body[data-order-surface="kiosk"] .review-pages button:disabled { opacity: .45; }
+body[data-order-surface="kiosk"] .payment-method-grid { margin: 0; gap: 20px; }
+body[data-order-surface="kiosk"] .payment-method { min-height: 180px; padding: 26px; }
+body[data-order-surface="kiosk"] .payment-method span { font-size: 16px; }
+body[data-order-surface="kiosk"] .cash-tenders button { min-height: 64px; font-size: 16px; }
+body[data-order-surface="kiosk"] .success-number { min-height: 240px; margin: 0; }
+
+body[data-order-surface="kiosk"] .order-product-dialog {
+  width: min(60vw, 700px);
+  max-width: none;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+body[data-order-surface="kiosk"] .product-detail {
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: minmax(0, 29%) minmax(0, 71%);
+  overflow: hidden;
+}
+
+body[data-order-surface="kiosk"] .product-detail-copy {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 30px 38px 36px;
+  overflow: hidden;
+}
+
+body[data-order-surface="kiosk"] .product-detail-copy h2 { font-size: 60px; }
+body[data-order-surface="kiosk"] .product-description { margin-bottom: 12px; font-size: 16px; }
+body[data-order-surface="kiosk"] .modifier-groups { gap: 14px; margin: 16px 0; }
+body[data-order-surface="kiosk"] .modifier-group legend { font-size: 14px; }
+body[data-order-surface="kiosk"] .modifier-option { min-height: 64px; padding: 10px 18px; font-size: 16px; }
+body[data-order-surface="kiosk"] .modifier-option small { font-size: 12px; }
+body[data-order-surface="kiosk"] .modifier-note { margin: 14px 0; font-size: 14px; }
+body[data-order-surface="kiosk"] .modifier-note input { min-height: 64px; font-size: 17px; }
+body[data-order-surface="kiosk"] .detail-meta { margin-top: auto; margin-bottom: 16px; }
+body[data-order-surface="kiosk"] .detail-meta span { padding: 15px; }
+body[data-order-surface="kiosk"] .detail-actions { min-height: 72px; }
+body[data-order-surface="kiosk"] .detail-done { min-height: 72px; padding: 0 24px; font-size: 17px; }
+
+@media (max-height: 1500px) {
+  body[data-order-surface="kiosk"] main { padding-top: 20px; padding-bottom: 24px; }
+  body[data-order-surface="kiosk"] .flow-heading { margin-top: 20px; margin-bottom: 24px; }
+  body[data-order-surface="kiosk"] .product-detail { grid-template-rows: minmax(0, 22%) minmax(0, 78%); }
+  body[data-order-surface="kiosk"] .product-detail-copy { padding-top: 18px; padding-bottom: 18px; }
+}

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saga POS · Kasir manual</title>
+  <link rel="stylesheet" href="/pos-alpha.css">
+  <link rel="stylesheet" href="/cashier.css">
+</head>
+<body class="operator-body surface-cashier">
+  <a class="skip-link" href="#main-content">Lewati ke konten</a>
+  <header class="environment-banner"><span>LOCAL SPRINT LAB</span><span>Cashier fallback · fixture tanpa uang nyata</span></header>
+  <main id="main-content" class="operator-shell" tabindex="-1">
+    <section id="operator-login" class="operator-login">
+      <div><p class="eyebrow">SagaPOS · operasional</p><h1>Kasir manual</h1><p>Catat pesanan pelanggan, terima pembayaran, dan kelola shift dari satu layar.</p><p id="cashier-bootstrap-status" role="status">Menyiapkan kasir. Jika halaman tidak siap, muat ulang; jangan kirim password melalui halaman yang bermasalah.</p><a id="owner-login-link" class="button button-primary" href="/dashboard?next=%2Fcashier" hidden>Masuk dengan akun Owner</a></div>
+      <a id="team-login-link" class="button button-secondary" href="/team-access" hidden>Masuk dengan akun tim</a>
+      <form id="login-form" class="login-card" method="post" action="/api/operator/login">
+        <fieldset id="cashier-login-fields" disabled>
+        <label>Organization<input name="organizationSlug" value="kopi-saga" required></label>
+        <label>Employee ID<input name="employeeId" value="CASHIER-01" autocomplete="username" required></label>
+        <label>Password sementara<input name="password" type="password" autocomplete="current-password" required></label>
+        <button class="button button-primary" type="submit">Masuk Cashier Mode</button>
+        </fieldset>
+        <p id="login-status" class="form-status" role="alert"></p>
+        <noscript>Aktifkan JavaScript untuk masuk. Password tidak dikirim bila aplikasi belum siap.</noscript>
+      </form>
+    </section>
+    <section id="cashier-app" hidden>
+      <header class="operator-header">
+        <div><p class="eyebrow">SagaPOS · pesanan & pembayaran</p><h1>Kasir manual</h1></div>
+        <div class="operator-context"><span id="actor-badge" class="count-pill"></span><span id="cashier-sync-status" class="cashier-sync-status" role="status" aria-live="polite">Memeriksa koneksi.</span><details class="cashier-tools"><summary>Menu kasir</summary><nav aria-label="Menu kasir"><a class="button button-secondary" href="/dashboard">Dashboard Owner</a><button id="cashier-history-open" class="button button-secondary">Riwayat & nota</button><button id="cashier-drafts-open" class="button button-secondary">Draft tablet</button><button id="cashier-queue-open" class="button button-secondary">Antrean pembayaran</button><button id="cashier-sync-button" type="button" class="button button-secondary">Perbarui antrean</button><button id="logout-button" class="button button-ghost">Keluar</button></nav></details></div>
+      </header>
+      <section id="cashier-order-page" aria-label="Pemesanan">
+      <section id="shift-panel" class="operator-intro"></section>
+      <section id="pending-cash-assists" class="assisted-cash-queue" aria-labelledby="pending-cash-assists-title" hidden></section>
+      <nav class="cashier-portrait-nav" aria-label="Navigasi pesanan tablet"><a href="#catalog-title">Menu</a><a href="#cashier-cart-title" id="cashier-cart-jump">Pesanan · 0 item</a></nav>
+      <div class="cashier-layout">
+        <section class="catalog-panel" aria-labelledby="catalog-title"><div class="cashier-section-heading"><div><p class="eyebrow">Menu outlet</p><h2 id="catalog-title">Tambah pesanan</h2></div><span id="cashier-menu-count" class="cashier-key-hint" role="status"></span></div><div class="cashier-search-row"><label for="cashier-search">Cari menu<input id="cashier-search" type="search" autocomplete="off" placeholder="Nama menu, misalnya latte"></label><button id="cashier-search-clear" type="button" class="button button-secondary">Hapus pencarian</button></div><div id="cashier-categories" class="category-tabs" role="tablist" aria-label="Kategori menu"></div><div id="cashier-products" class="product-grid"></div></section>
+        <section class="cart-panel" aria-labelledby="cashier-cart-title">
+          <div class="cart-heading"><div><p class="eyebrow">Keranjang aktif</p><h2 id="cashier-cart-title">Pesanan</h2></div><span id="cashier-count" class="count-pill">0 item</span></div>
+          <div id="cashier-cart-tools" class="cashier-cart-tools"><button id="cashier-save-draft" class="button button-secondary">Simpan draft</button><button id="cashier-clear" class="button button-ghost">Kosongkan</button></div><p id="cashier-draft-status" class="cashier-key-hint" role="status"></p>
+          <div class="cashier-scroll-region">
+            <div id="cashier-cart" class="cart-items"></div>
+            <button id="cashier-benefits-open" type="button" class="button button-secondary">Promo & diskon</button>
+            <p id="cashier-benefit-summary" role="status"></p>
+            <div class="checkout-fields" aria-label="Detail checkout">
+              <label>Tipe pesanan<select id="order-type"><option value="TAKEAWAY">Takeaway</option><option value="DINE_IN">Dine-in</option></select></label>
+              <label>Metode pembayaran<select id="payment-method"><option value="CASH">Tunai</option><option value="QRIS_STATIC_MANUAL" disabled>QRIS manual · konfirmasi merchant</option><option value="QRIS">QRIS simulator</option></select></label>
+              <details class="cashier-member-fields span-two"><summary>Member & reward · opsional</summary><label>Kode member<input id="member-code" placeholder="Kode member pelanggan"></label><label>Reward<select id="reward-id"><option value="">Tanpa Reward</option><option value="FREE-AMERICANO">Gratis Americano (fixture)</option></select></label></details>
+              <label id="received-field" class="span-two">Uang diterima<input id="received-rupiah" inputmode="numeric" autocomplete="off" placeholder="Masukkan nominal Rupiah" aria-describedby="cash-tender-status"></label>
+            </div>
+            <section id="cash-tender-panel" class="cash-tender-panel" aria-labelledby="cash-tender-title" hidden>
+              <div class="cash-tender-heading"><strong id="cash-tender-title">Pilih uang diterima</strong><span>Shortcut kasir</span></div>
+              <div id="cash-tender-options" class="cash-tender-options"></div>
+              <p id="cash-tender-status" class="cash-tender-status" role="status" aria-live="polite">Masukkan nominal untuk melihat kembalian.</p>
+            </section>
+          </div>
+          <div class="cashier-payment-footer">
+            <div class="cart-summary" aria-live="polite"><div id="cashier-cart-breakdown"></div><div><span>Total server</span><strong id="cashier-total">Rp0</strong></div><div class="cashier-saving" id="cashier-saving" hidden><span>Hemat</span><strong>Rp0</strong></div><p id="quote-status">Tambahkan item untuk meminta harga final dari server.</p></div>
+            <button id="cashier-checkout" class="button button-primary button-block cashier-pay-action" disabled>Konfirmasi pembayaran</button>
+            <button id="cashier-pay" class="button button-primary button-block cashier-pay-action" disabled>Bayar</button>
+            <div id="checkout-result" class="result-card" role="status" aria-live="polite" aria-atomic="true" aria-busy="false" hidden></div>
+          </div>
+        </section>
+      </div>
+      </section>
+      <dialog id="cashier-item-dialog" class="cashier-dialog" aria-labelledby="cashier-item-title"><header><h2 id="cashier-item-title">Atur menu</h2><button type="button" class="button button-ghost" data-dialog-close aria-label="Tutup pilihan menu">×</button></header><form id="cashier-item-form"><div id="cashier-item-options"></div><div class="cashier-item-quantity"><label>Jumlah<input name="qty" type="number" min="1" max="20" value="1" required></label><button type="button" class="button button-secondary" data-item-qty="-1" aria-label="Kurangi jumlah menu">−</button><button type="button" class="button button-secondary" data-item-qty="1" aria-label="Tambah jumlah menu">+</button></div><label>Catatan untuk bar / dapur<textarea name="note" maxlength="120" placeholder="Misalnya: es sedikit"></textarea></label><p id="cashier-item-status" role="alert"></p><footer><span id="cashier-item-preview" role="status"></span><button id="cashier-item-delete" type="button" class="button button-ghost">Hapus item</button><button type="submit" class="button button-primary">Simpan item</button></footer></form></dialog>
+      <section id="cashier-payment-page" class="cashier-page" aria-labelledby="cashier-payment-title" hidden><header><button id="cashier-payment-back" type="button" class="button button-secondary">← Kembali ke Pesanan</button><div><p class="eyebrow">Langkah 2 · pembayaran</p><h2 id="cashier-payment-title" tabindex="-1">Pembayaran</h2></div></header><div class="cashier-payment-layout"><section aria-label="Review pesanan"><p class="eyebrow">Periksa sebelum membayar</p><div id="cashier-payment-items"></div><div id="cashier-payment-breakdown"></div><strong id="cashier-payment-total" class="cashier-large-total">Rp0</strong><p id="cashier-payment-authority" role="status"></p></section><section id="cashier-payment-controls" aria-label="Pilih pembayaran"><h3>Metode pembayaran</h3><div id="cashier-payment-methods" class="cashier-payment-methods" role="group" aria-label="Pilihan bayar cepat"></div></section></div></section>
+      <dialog id="cashier-shift-dialog" class="cashier-dialog" aria-labelledby="cashier-shift-title"><header><h2 id="cashier-shift-title">Shift kas</h2><button type="button" class="button button-ghost" data-dialog-close aria-label="Tutup pengaturan shift">×</button></header><div id="cashier-shift-body"></div></dialog>
+      <section id="cashier-result-page" class="cashier-page" aria-labelledby="cashier-result-title" hidden><header><div><p class="eyebrow">Status transaksi</p><h2 id="cashier-result-title" tabindex="-1">Hasil transaksi</h2></div></header><footer><button id="cashier-print" class="button button-secondary" disabled>Cetak nota</button><button id="cashier-new-order" class="button button-primary">Pesanan baru</button></footer></section>
+      <dialog id="cashier-list-dialog" class="cashier-dialog" aria-labelledby="cashier-list-title"><header><h2 id="cashier-list-title">Riwayat</h2><button id="cashier-queue-refresh" type="button" class="button button-secondary" hidden>Perbarui antrean</button><button type="button" class="button button-ghost" data-dialog-close aria-label="Tutup daftar kasir">×</button></header><div id="cashier-list-content"></div></dialog>
+      <dialog id="cashier-confirm-dialog" class="cashier-dialog" aria-labelledby="cashier-confirm-title"><h2 id="cashier-confirm-title">Konfirmasi perubahan</h2><p id="cashier-confirm-message"></p><form method="dialog"><button class="button button-secondary" value="cancel">Batal</button><button class="button button-primary" value="yes">Lanjutkan</button></form></dialog>
+      <dialog id="cashier-operations-dialog" class="cashier-dialog" aria-labelledby="cashier-operations-title"><header><h2 id="cashier-operations-title">Operasional kasir</h2><button type="button" class="button button-ghost" data-dialog-close aria-label="Tutup operasional kasir">×</button></header><div id="cashier-operations-body"></div><p id="cashier-operations-status" role="status" aria-live="polite"></p></dialog>
+      <dialog id="cashier-benefits-dialog" class="cashier-dialog" aria-labelledby="cashier-benefits-title">
+        <header><h2 id="cashier-benefits-title">Promo & diskon</h2><button type="button" class="button button-ghost" data-dialog-close aria-label="Tutup promo dan diskon">×</button></header>
+        <form id="cashier-benefits-form">
+          <label>Kode promo / voucher<input name="promotionCode" maxlength="64" autocomplete="off" placeholder="Masukkan kode pelanggan"></label>
+          <label><input name="automatic" type="checkbox" checked>Gunakan promo otomatis yang memenuhi syarat</label>
+          <fieldset id="cashier-manual-discount"><legend>Diskon manual</legend>
+            <p id="cashier-discount-limit"></p>
+            <label>Jenis diskon<select name="discountType" aria-label="Jenis diskon"><option value="">Tanpa diskon manual</option><option value="PERCENT">Persen</option><option value="FIXED">Potongan rupiah</option></select></label>
+            <label>Nilai diskon<input name="discountValue" type="number" min="0" step="0.01"></label>
+            <label>Berlaku untuk<select name="productId" aria-label="Berlaku untuk"><option value="">Seluruh tagihan</option></select></label>
+            <label>Alasan diskon<input name="reason" maxlength="160" placeholder="Contoh: kompensasi pelayanan"></label>
+          </fieldset>
+          <p>Promo, voucher, member, reward, dan diskon manual tidak digabung. Harga akhir diperiksa oleh server.</p>
+          <p id="cashier-benefits-status" role="alert"></p>
+          <footer><button id="cashier-benefits-remove" type="button" class="button button-secondary">Hapus promo / diskon</button><button id="cashier-discount-request" type="button" class="button button-secondary" hidden>Minta persetujuan Owner</button><button type="submit" class="button button-primary">Terapkan & periksa</button></footer>
+        </form>
+      </dialog>
+      <section id="cashier-print-receipt" aria-label="Nota transaksi" hidden></section>
+    </section>
+  </main>
+  <div id="global-status" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="/cashier.js"></script>
+</body>
+</html>

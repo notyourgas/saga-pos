@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>Kopi Saga · Self Order</title>
+  <link rel="stylesheet" href="/kiosk.css">
+  <link rel="stylesheet" href="/kopisaga-kiosk-v4.css">
+</head>
+<body>
+  <a class="skip-link" href="#kiosk-app">Lewati ke konten</a>
+  <div id="environment-banner" class="environment-banner" role="status" hidden></div>
+  <div id="network-banner" class="network-banner" role="status" aria-live="polite" hidden></div>
+  <main id="kiosk-app" class="kiosk-root" tabindex="-1">
+    <section class="kiosk-screen loading-screen" aria-label="Memuat kiosk">
+      <div class="status-spinner" aria-hidden="true"></div>
+      <p>Menyiapkan menu…</p>
+    </section>
+  </main>
+  <dialog id="idle-dialog" class="idle-dialog" aria-labelledby="idle-title">
+    <p class="index-label">SESI · JEDA</p>
+    <h2 id="idle-title">Masih memesan?</h2>
+    <p>Pesanan akan dibatalkan untuk melindungi privasi layar ini.</p>
+    <strong id="idle-countdown">30</strong>
+    <button class="primary-action" type="button" data-action="continue-session">Lanjutkan Pesanan</button>
+    <button class="secondary-action" type="button" data-action="reset-session">Batalkan dan Mulai Ulang</button>
+  </dialog>
+  <dialog id="help-dialog" class="help-dialog" aria-labelledby="help-title">
+    <p id="help-kicker" class="index-label">BANTUAN</p>
+    <h2 id="help-title">Butuh bantuan?</h2>
+    <p id="help-message">Temui barista di kasir. Pesananmu tetap tersimpan di layar ini.</p>
+    <div id="help-payment-note" class="help-payment-note" hidden>
+      <strong>Sudah membayar?</strong>
+      <span>Jangan scan atau bayar ulang. Minta barista membantu memeriksa status pembayaran.</span>
+    </div>
+    <button id="help-close-action" class="primary-action" type="button" data-action="close-help"><span>Kembali ke Pesanan</span></button>
+    <button id="help-cancel-action" class="secondary-action help-cancel-action" type="button" data-action="request-session-cancel" hidden>Batalkan pesanan</button>
+    <button id="help-keep-action" class="primary-action" type="button" data-action="keep-session" hidden><span>Lanjutkan pesanan</span></button>
+    <button id="help-confirm-cancel-action" class="secondary-action destructive-action" type="button" data-action="confirm-session-cancel" hidden>Ya, batalkan dan mulai ulang</button>
+  </dialog>
+  <div id="global-status" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="/kiosk.js"></script>
+</body>
+</html>

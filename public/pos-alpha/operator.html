@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Saga POS · Operator</title>
+  <link rel="stylesheet" href="/pos-alpha.css">
+  <link rel="stylesheet" href="/owner-native-staff.css">
+  <link rel="stylesheet" href="/ui/esb-ui-state-system.css">
+  <link rel="stylesheet" href="/ui/esb-owner-report-integration.css">
+</head>
+<body class="operator-body">
+  <a class="skip-link" href="#main-content">Lewati ke konten</a>
+  <div class="environment-banner" role="status">
+    <span id="delivery-scope">CONTROLLED OPERATOR PREVIEW</span>
+    <span id="delivery-persistence">Data simulator · bukan production</span>
+  </div>
+
+  <main id="main-content" class="operator-shell">
+    <section id="operator-login" class="operator-login" aria-labelledby="login-title">
+      <div class="operator-login-intro">
+        <div class="login-brand" aria-hidden="true">S</div>
+        <p class="eyebrow">Saga POS Operator</p>
+        <h1 id="login-title">Masuk ke perangkat operasional</h1>
+        <p id="login-description">Role dan mode diberikan oleh sesi server.</p>
+      </div>
+      <form id="login-form" class="login-card" novalidate>
+        <div id="login-identity-fields" class="login-identity-fields">
+          <label>Organization<input name="organizationSlug" value="kopi-saga" autocomplete="organization" required></label>
+          <label>Employee ID<input id="employee-id" name="employeeId" autocomplete="username" required></label>
+        </div>
+        <div class="password-field">
+          <label id="password-label" for="operator-password">Password sementara</label>
+          <div class="password-control">
+            <input id="operator-password" name="password" type="password" autocomplete="current-password" required aria-describedby="password-help login-status">
+            <button id="password-toggle" class="password-toggle" type="button" aria-controls="operator-password" aria-pressed="false">Lihat</button>
+          </div>
+        </div>
+        <p id="password-help" class="login-help">Password tidak disimpan di perangkat ini.</p>
+        <button id="login-submit" class="button button-primary button-block" type="submit">Masuk</button>
+        <p id="login-status" class="form-status" role="alert"></p>
+      </form>
+    </section>
+
+    <section id="operator-app" hidden>
+      <div id="dashboard-sidebar" class="dashboard-sidebar" hidden aria-label="Navigasi Owner Dashboard"></div>
+      <div id="dashboard-nav-backdrop" class="dashboard-nav-backdrop" aria-hidden="true" hidden></div>
+      <div class="operator-app-main">
+        <header class="operator-header">
+          <button id="dashboard-menu-button" class="dashboard-menu-button" type="button" aria-expanded="false" aria-controls="dashboard-sidebar" hidden><span aria-hidden="true">☰</span><span class="sr-only">Buka navigasi dashboard</span></button>
+          <div class="operator-heading">
+            <p id="surface-eyebrow" class="eyebrow">Kopi Saga Salak</p>
+            <h1 id="surface-title" class="dashboard-page-title" tabindex="-1">Nota Checker</h1>
+          </div>
+          <div class="operator-context">
+            <span id="actor-badge" class="count-pill"></span>
+            <span class="service-state"><span class="dot"></span><span id="service-state-label">Ready</span></span>
+            <button id="dashboard-refresh-button" class="button button-ghost" type="button" hidden>Perbarui</button>
+            <a id="dashboard-cashier-link" class="button button-ghost" href="/cashier" hidden>Kasir</a>
+            <a id="dashboard-kds-link" class="button button-ghost" href="/kds" hidden>Lihat KDS</a>
+            <button id="logout-button" class="button button-ghost" type="button">Keluar</button>
+          </div>
+        </header>
+        <div id="operator-content" class="operator-content" aria-live="off"></div>
+      </div>
+      <nav id="dashboard-mobile-navigation" class="dashboard-mobile-navigation" aria-label="Navigasi cepat Owner" hidden></nav>
+    </section>
+  </main>
+
+  <div id="global-status" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="/operator.js"></script>
+</body>
+</html>

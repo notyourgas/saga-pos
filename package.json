@@ -1,0 +1,27 @@
+{
+  "name": "@sagadevs/sagaops-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check.mjs && tsc --noEmit",
+    "start": "node scripts/serve-pos-alpha.mjs",
+    "pos:alpha:start": "node scripts/serve-pos-alpha.mjs",
+    "pos:durable:start": "node scripts/serve-pos-durable.mjs",
+    "uat:start": "node scripts/serve-uat.mjs",
+    "test": "node --test tests/public-snapshot.test.mjs",
+    "test:all": "npm run check && npm test"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2",
+    "pg": "8.23.0",
+    "qrcode": "1.5.4"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "axe-core": "^4.10.3",
+    "playwright": "^1.61.1",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}

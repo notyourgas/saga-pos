@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saga POS · HR & Tim</title>
+  <link rel="stylesheet" href="/pos-alpha.css">
+  <link rel="stylesheet" href="/hr.css">
+</head>
+<body class="operator-body surface-hr">
+  <a class="skip-link" href="#main-content">Lewati ke konten</a>
+  <div class="hr-app-shell">
+    <aside class="hr-sidebar" aria-label="Navigasi SagaPOS">
+      <a class="hr-brand" href="/dashboard" aria-label="SagaPOS Dashboard"><strong>SagaPOS</strong><span>HR &amp; Tim</span></a>
+      <nav class="hr-product-nav" aria-label="Modul operasional">
+        <a href="/dashboard">Beranda</a><a href="/dashboard#sales">Penjualan</a><a href="/dashboard#orders">Pesanan</a><a href="/dashboard#products">Produk</a><a href="/dashboard#inventory">Stok &amp; HPP</a><a href="/dashboard#finance">Keuangan</a><a class="is-current" href="/hr" aria-current="page">HR &amp; Tim</a><a href="/dashboard#members">Member</a>
+      </nav>
+      <div class="hr-sidebar-foot"><a href="/dashboard#settings">Pengaturan</a><div class="hr-profile-chip"><span aria-hidden="true">AD</span><div><strong>Demo Owner</strong><small>Owner</small></div></div></div>
+    </aside>
+
+    <main id="main-content" class="hr-main">
+      <header class="hr-topbar">
+        <div><p class="hr-breadcrumb">SagaPOS <span>/</span> HR &amp; Tim</p><h1 id="page-title">Karyawan</h1><p id="page-subtitle">Kelola profil, tarif, akses, dan status tim dari satu tempat.</p></div>
+        <div class="hr-topbar-actions"><a class="hr-location" href="/dashboard">Kopi Saga Solo</a><button id="logout" class="hr-button hr-button-secondary" hidden>Keluar</button></div>
+      </header>
+
+      <nav class="hr-section-tabs" aria-label="Area kerja HR">
+        <button type="button" data-view-target="overview" aria-current="page">Ringkasan</button><button type="button" data-view-target="people">Karyawan</button><button type="button" data-view-target="schedules">Jadwal</button><button type="button" data-view-target="workHours">Absensi</button><button type="button" data-view-target="requests">Permohonan <span id="request-badge" hidden>0</span></button><button type="button" data-view-target="payroll">Rekap Gaji</button>
+      </nav>
+
+      <p id="status" class="hr-live-status" role="status" aria-live="polite">Memeriksa koneksi akun…</p>
+      <section id="login" class="hr-login-card" hidden aria-label="Sesi Owner diperlukan">
+        <div><p class="hr-kicker">Sesi diperlukan</p><h2>Masuk untuk mengelola tim</h2><p>Gunakan sesi Owner SagaPOS agar seluruh akses dan audit tetap terikat ke akun yang benar.</p></div>
+        <div class="hr-login-actions"><a class="hr-button hr-button-primary" href="/dashboard?next=%2Fhr">Masuk sebagai Owner</a><button id="connect" class="hr-button hr-button-secondary" hidden>Hubungkan sesi HR</button></div>
+      </section>
+
+      <section id="workspace" class="hr-workspace" hidden aria-label="Data HR">
+        <section class="hr-overview" aria-label="Ringkasan operasional">
+          <article class="hr-metric"><span id="metric-label-1">Total karyawan</span><strong id="metric-value-1">—</strong><small id="metric-note-1">Memuat data</small></article>
+          <article class="hr-metric hr-metric-success"><span id="metric-label-2">Aktif hari ini</span><strong id="metric-value-2">—</strong><small id="metric-note-2">Status terbaru</small></article>
+          <article class="hr-metric"><span id="metric-label-3">Perlu ditinjau</span><strong id="metric-value-3">—</strong><small id="metric-note-3">Butuh keputusan</small></article>
+          <article class="hr-metric"><span id="metric-label-4">Kesiapan data</span><strong id="metric-value-4">—</strong><small id="metric-note-4">Dari sumber HR</small></article>
+        </section>
+
+        <div class="hr-commandbar">
+          <form id="filter" class="hr-filter">
+            <label class="hr-view-field">Tampilan<select id="view"><option value="overview">Ringkasan tim</option><option value="people">Daftar staf</option><option value="workspaces">Workspace</option><option value="templates">Template shift</option><option value="schedules">Jadwal</option><option value="requests">Permohonan staf</option><option value="swapReviews">Review swap</option><option value="workHours">Jam kerja payroll</option><option value="payroll">Periode payroll</option></select></label>
+            <label id="search-label" class="hr-search">Cari nama atau kode staf<input id="search" type="search" maxlength="120" autocomplete="off" placeholder="Cari karyawan"></label>
+            <label id="from-label" hidden>Dari tanggal<input id="from" type="date"></label><label id="to-label" hidden>Sampai tanggal<input id="to" type="date"></label>
+            <button class="hr-button hr-button-secondary">Tampilkan</button>
+          </form>
+          <div class="hr-primary-actions"><button type="button" class="hr-button hr-button-secondary" data-jump-view="templates">Template shift</button><button type="button" class="hr-button hr-button-primary" data-open-tool="current">Tambah data</button></div>
+        </div>
+
+        <div class="hr-content-grid">
+          <section class="hr-data-card" aria-labelledby="caption-heading">
+            <header class="hr-data-heading"><div><p class="hr-kicker" id="section-kicker">Data tim</p><h2 id="caption-heading">Daftar karyawan</h2><p id="summary">Memuat data terbaru…</p></div><span class="hr-truth-pill">HR native SagaPOS</span></header>
+            <div class="hr-table" tabindex="0" role="region" aria-label="Daftar hasil HR"><table><caption id="caption">Daftar staf</caption><thead id="head"></thead><tbody id="rows"></tbody></table></div>
+            <div id="empty-state" class="hr-empty" hidden><strong>Belum ada data yang sesuai</strong><p>Ubah filter atau tambahkan data baru bila akses Anda mengizinkan.</p></div>
+          </section>
+          <section class="hr-attention" aria-label="Tindakan cepat"><div><p class="hr-kicker">Perlu tindakan</p><h2>Jaga data tim tetap siap</h2><p id="attention-copy">Periksa profil dan akses yang belum lengkap sebelum jadwal diterbitkan.</p></div><button type="button" class="hr-link-button" data-jump-view="requests">Lihat permohonan</button><button type="button" class="hr-link-button" data-jump-view="swapReviews">Tinjau tukar shift</button><button type="button" class="hr-link-button" data-jump-view="workHours">Periksa jam kerja</button></section>
+        </div>
+
+        <div id="roles" class="hr-role-switch" aria-label="Pindah peran"></div>
+        <section class="hr-tools" aria-label="Formulir operasional">
+          <details data-tool="workspaces"><summary>Tambah Workspace</summary><form id="create-workspace" class="hr-form-grid"><label>Kode Workspace<input name="code" required minlength="2" maxlength="40" pattern="[A-Za-z0-9_-]+"></label><label>Nama Workspace<input name="name" required minlength="2" maxlength="160"></label><label>Latitude<input name="latitude" type="number" min="-90" max="90" step="any" required></label><label>Longitude<input name="longitude" type="number" min="-180" max="180" step="any" required></label><label>Zona waktu<input name="timezone" value="Asia/Jakarta" required></label><label>Radius absensi (meter)<input name="radiusM" type="number" min="25" max="1000" value="100" required></label><p class="hr-form-note">Workspace dibuat aktif. Pastikan koordinat lokasi benar sebelum disimpan.</p><button class="hr-button hr-button-primary">Simpan Workspace</button></form></details>
+          <details data-tool="people"><summary>Tambah staf</summary><form id="create-staff" class="hr-form-grid"><label>Kode staf<input name="employeeCode" required maxlength="48"></label><label>Nama panggilan<input name="preferredName" required maxlength="120"></label><label>Nama resmi<input name="legalName" required maxlength="180"></label><label>Jenis kerja<select name="employmentType"><option value="permanent">Tetap</option><option value="contract">Kontrak</option><option value="part_time">Paruh waktu</option><option value="daily">Harian</option><option value="intern">Magang</option><option value="seasonal">Musiman</option></select></label><label>Tanggal mulai<input name="startsOn" type="date" required></label><label>Workspace utama<select id="staff-workspace" name="primaryWorkspaceId" required><option value="">Muat Workspace terlebih dahulu</option></select></label><p class="hr-form-note">Pembuatan staf belum menerbitkan akses login. Kredensial awal dibuat melalui daftar staf.</p><button class="hr-button hr-button-primary">Simpan staf</button></form></details>
+          <details data-tool="templates" hidden><summary>Tambah template shift</summary><form id="create-template" class="hr-form-grid"><label>Workspace<select id="template-workspace" name="locationId" required><option value="">Muat Workspace terlebih dahulu</option></select></label><label>Nama template<input name="name" required minlength="2" maxlength="120"></label><label>Mulai<input name="localStartTime" type="time" required></label><label>Selesai<input name="localEndTime" type="time" required></label><label>Istirahat (menit)<input name="breakMinutes" type="number" min="0" max="240" value="0" required></label><label>Kompensasi istirahat<select name="breakCompensation"><option value="unpaid">Tidak dibayar</option><option value="paid">Dibayar</option></select></label><label>Peran (opsional)<input name="roleLabel" maxlength="100"></label><label>Berlaku mulai<input id="template-effective" name="effectiveFrom" type="date" required></label><p class="hr-form-note">Template baru disimpan sebagai draft. Terbitkan dari tabel setelah data diperiksa.</p><button class="hr-button hr-button-primary" data-scheduling-write="true">Simpan template</button></form></details>
+          <details data-tool="schedules" hidden><summary>Tambah jadwal</summary><form id="create-schedule" class="hr-form-grid"><label>Staf<select id="schedule-employee" name="employeeId" required><option value="">Muat opsi terlebih dahulu</option></select></label><label>Workspace<select id="schedule-workspace" name="locationId" required><option value="">Muat opsi terlebih dahulu</option></select></label><label>Tanggal kerja<input id="schedule-date" name="businessDate" type="date" required></label><label>Mulai<input name="localStartTime" type="time" required></label><label>Selesai<input name="localEndTime" type="time" required></label><label>Istirahat (menit)<input name="breakMinutes" type="number" min="0" max="240" value="0" required></label><label>Peran (opsional)<input name="roleLabel" maxlength="100"></label><p class="hr-form-note">Jadwal baru disimpan sebagai draft. Terbitkan dari tabel setelah diperiksa.</p><button class="hr-button hr-button-primary" data-scheduling-write="true">Simpan jadwal</button></form></details>
+        </section>
+      </section>
+    </main>
+  </div>
+  <dialog id="detail-dialog" class="hr-detail-dialog" aria-labelledby="detail-title"><div class="hr-detail-shell"><header><div><p class="hr-kicker" id="detail-kicker">Detail</p><h2 id="detail-title">Detail data</h2></div><button id="close-detail" class="hr-button hr-button-secondary" type="button">Tutup</button></header><div id="detail-content" class="hr-detail-content"></div><footer><p>Perubahan sensitif tetap mengikuti izin, audit, dan sumber data HR native SagaPOS.</p></footer></div></dialog>
+  <dialog id="credential-dialog" class="hr-dialog" aria-labelledby="credential-title"><div class="hr-dialog-body"><p class="hr-kicker">Akses staf</p><h2 id="credential-title">Terbitkan akses awal staf</h2><p id="credential-person"></p><p>Kata sandi sementara hanya ditampilkan di sini. Bagikan secara privat; jangan simpan di perangkat bersama. Ini bukan pemberian izin kasir atau HR.</p><button id="issue-credential" class="hr-button hr-button-primary">Ya, terbitkan akses awal</button><div id="credential-result" class="hr-credential-result" role="status"></div><button id="close-credential" class="hr-button hr-button-secondary">Tutup dan hapus tampilan</button></div></dialog>
+  <script type="module" src="/hr.js"></script>
+</body>
+</html>

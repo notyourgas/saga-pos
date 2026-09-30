@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+coverage/
+.local/
+.evidence/
+evidence/
+*.log
+__pycache__/
+*.pyc
+.vercel/

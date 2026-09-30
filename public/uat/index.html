@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>SagaOPS · UAT Operator</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Lewati ke konten</a>
+  <div class="environment" role="status">
+    <span>LOCAL INTERNAL ALPHA</span>
+    <span>production=false</span>
+    <span>QRIS simulator</span>
+    <span>NFC & printer NOT RUN</span>
+  </div>
+
+  <main id="main-content" tabindex="-1">
+    <section id="login-view" class="login-layout" aria-labelledby="login-title">
+      <div class="brand-panel">
+        <p class="eyebrow">Kopi Saga · PC DEMO</p>
+        <h1 id="login-title">UAT Operator Console</h1>
+        <p class="lede">Validasi alur OWNER dan STAFF pada layanan lokal. Semua transaksi adalah fixture dan tidak memanggil provider nyata.</p>
+        <dl class="boundary-list">
+          <div><dt>Outlet</dt><dd>Kopi Saga Salak</dd></div>
+          <div><dt>Device</dt><dd>PC-DEV-001</dd></div>
+          <div><dt>Data</dt><dd>Simulasi lokal</dd></div>
+        </dl>
+      </div>
+      <form id="login-form" class="panel login-card">
+        <p class="step-label">Masuk ke profil Chrome ini</p>
+        <label>Organization slug<input name="organizationSlug" autocomplete="organization" value="kopi-saga" required></label>
+        <label>Employee ID<input name="employeeId" autocomplete="username" placeholder="OWNER-DEMO" required></label>
+        <label>Password sementara<input name="password" type="password" autocomplete="current-password" required></label>
+        <button class="button primary" type="submit">Masuk ke UAT</button>
+        <p class="form-note">Gunakan kredensial sementara dari terminal UAT. Role ditentukan server dan tidak disimpan di browser.</p>
+        <p id="login-status" class="inline-status" role="alert"></p>
+      </form>
+    </section>
+
+    <section id="app-view" class="app-shell" hidden>
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">SagaOPS operator</p>
+          <h1 id="page-title">Ringkasan UAT</h1>
+        </div>
+        <div class="session-context" aria-label="Konteks sesi">
+          <span id="actor-badge" class="badge"></span>
+          <span id="outlet-badge" class="badge neutral"></span>
+          <button id="logout-button" class="button ghost" type="button">Keluar</button>
+        </div>
+      </header>
+      <nav class="tabs" aria-label="Navigasi UAT">
+        <button type="button" data-route="overview" aria-current="page">Ringkasan</button>
+        <button type="button" data-route="shift">Shift</button>
+        <button type="button" data-route="pos">POS & Member</button>
+        <button type="button" data-route="controls">Kontrol</button>
+        <button type="button" data-route="evidence">Bukti</button>
+      </nav>
+      <div id="page-content" class="page-content"></div>
+    </section>
+  </main>
+  <div id="global-status" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+import { createHash, randomUUID } from "node:crypto";
+
+export class DeviceRegistry {
+  constructor({ clock = () => new Date() } = {}) { this.clock = clock; this.devices = new Map(); this.sessions = new Map(); }
+  register({ name, type, os, browser, location, outletId, modes, owner }) { const device = { id: randomUUID(), name, type, os, browser, location, outletId, modes: [...new Set(modes)], owner, nfcAvailable: false, printerAvailable: false, status: "ACTIVE", createdAt: this.clock().toISOString(), lastSeenAt: null }; this.devices.set(device.id, device); return structuredClone(device); }
+  heartbeat(deviceId, fingerprint) { const device = this.#device(deviceId); if (device.status !== "ACTIVE") throw new Error("device_inactive"); device.fingerprintHash = createHash("sha256").update(fingerprint).digest("hex"); device.lastSeenAt = this.clock().toISOString(); return { deviceId, status: "HEALTHY", lastSeenAt: device.lastSeenAt }; }
+  openSession(deviceId, { staffId, outletId, mode, fingerprint }) { const device = this.#device(deviceId); if (device.status !== "ACTIVE" || device.outletId !== outletId || !device.modes.includes(mode)) throw new Error("device_binding_invalid"); const fingerprintHash = createHash("sha256").update(fingerprint).digest("hex"); if (device.fingerprintHash && device.fingerprintHash !== fingerprintHash) throw new Error("device_fingerprint_mismatch"); const session = { id: randomUUID(), deviceId, staffId, outletId, mode, fingerprintHash, status: "ACTIVE", openedAt: this.clock().toISOString() }; this.sessions.set(session.id, session); return structuredClone(session); }
+  revoke(deviceId, reason) { const device = this.#device(deviceId); device.status = "REVOKED"; device.revocationReason = reason; for (const session of this.sessions.values()) if (session.deviceId === deviceId) session.status = "REVOKED"; return structuredClone(device); }
+  #device(id) { const device = this.devices.get(id); if (!device) throw new Error("device_not_found"); return device; }
+}

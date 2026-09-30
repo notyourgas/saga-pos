@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Laporan Inventory · SagaPOS</title>
+  <link rel="stylesheet" href="/inventory-reports.css">
+</head>
+<body>
+  <a class="skip-link" href="#report-content">Lewati ke laporan</a>
+  <header class="topbar">
+    <a class="brand" href="/dashboard" aria-label="SagaPOS dashboard">SAGA<span>POS</span></a>
+    <nav aria-label="Navigasi Owner">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/admin">Admin</a>
+      <a href="/inventory-reports" aria-current="page">Inventory</a>
+    </nav>
+  </header>
+
+  <main id="report-content">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">OWNER CONTROL ROOM</p>
+        <h1 id="page-title">Inventory, HPP &amp; COGS</h1>
+        <p class="lede">Periksa saldo, lapisan biaya, selisih, margin, dan kualitas data dari sumber yang dapat ditelusuri.</p>
+      </div>
+      <div id="report-status" class="status-pill" role="status" aria-live="polite">Memuat</div>
+    </section>
+
+    <form id="report-filter" class="filter-panel" aria-label="Filter periode laporan">
+      <fieldset id="view-selector" class="view-selector">
+        <legend>Cakupan laporan</legend>
+        <label><input name="view" type="radio" value="OUTLET" checked> Outlet aktif</label>
+        <label><input name="view" type="radio" value="COMPANY" disabled> Perusahaan</label>
+        <span id="view-hint" class="field-hint">Pilihan perusahaan tersedia setelah otorisasi server diperiksa.</span>
+      </fieldset>
+      <label>Mulai periode <input name="periodStart" type="date" required></label>
+      <label>Akhir periode <input name="periodEnd" type="date" required></label>
+      <label>Snapshot sampai <input name="snapshotCutoff" type="date" required><span class="field-hint">Tanggal ini diterjemahkan server memakai kalender bisnis outlet.</span></label>
+      <button type="submit">Terapkan periode</button>
+      <p id="calendar-note" class="calendar-note" aria-live="polite">Kalender bisnis akan ditentukan oleh server.</p>
+    </form>
+
+    <section id="state-panel" class="state-panel" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>Menyiapkan laporan</h2>
+      <p>Menarik snapshot dari provider laporan yang terhubung.</p>
+    </section>
+
+    <div id="report-view" hidden>
+      <section aria-labelledby="summary-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">RINGKASAN PERIODE</p><h2 id="summary-title">Angka utama</h2><p id="scope-summary" class="muted"></p></div>
+          <p id="report-period" class="muted"></p>
+        </div>
+        <div id="summary-cards" class="metric-grid"></div>
+      </section>
+
+      <section class="report-panel" aria-labelledby="detail-title">
+        <div class="section-heading report-heading">
+          <div><p class="eyebrow">RINCIAN</p><h2 id="detail-title">Saldo stok</h2></div>
+          <a id="csv-link" class="secondary-action" href="#">Unduh CSV</a>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Keluarga laporan">
+          <button id="tab-stockBalance" role="tab" aria-controls="report-table-panel" aria-selected="true" tabindex="0" data-family="stockBalance">Saldo stok</button>
+          <button id="tab-stockCard" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="stockCard">Kartu stok</button>
+          <button id="tab-stockValuation" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="stockValuation">Valuasi</button>
+          <button id="tab-costHppCogs" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="costHppCogs">HPP & COGS</button>
+          <button id="tab-wasteShrinkage" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="wasteShrinkage">Waste</button>
+          <button id="tab-ingredientTheoreticalActual" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="ingredientTheoreticalActual">Variance</button>
+          <button id="tab-profitability" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="profitability">Profitabilitas</button>
+          <button id="tab-supplierScorecard" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="supplierScorecard">Supplier</button>
+          <button id="tab-production" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="production">Produksi</button>
+          <button id="tab-forecastReplenishment" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="forecastReplenishment">Replenishment</button>
+          <button id="tab-dataQuality" role="tab" aria-controls="report-table-panel" aria-selected="false" tabindex="-1" data-family="dataQuality">Kualitas data</button>
+        </div>
+        <div id="report-table-panel" role="tabpanel" aria-labelledby="tab-stockBalance" tabindex="0">
+        <div id="table-status" class="table-status" role="status" aria-live="polite"></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr id="report-columns"></tr></thead>
+            <tbody id="report-rows"></tbody>
+          </table>
+        </div>
+        <div id="empty-state" class="empty-state" hidden>
+          <h3>Belum ada data pada periode ini</h3>
+          <p>Coba periode lain atau periksa apakah sumber laporan sudah selesai diproses.</p>
+        </div>
+        <div class="pagination">
+          <button id="previous-page" type="button" disabled>Halaman sebelumnya</button>
+          <span id="page-label">0 baris</span>
+          <button id="next-page" type="button" disabled>Halaman berikutnya</button>
+        </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="source-dialog" aria-labelledby="source-title">
+    <form method="dialog"><button class="dialog-close" aria-label="Tutup rincian sumber">×</button></form>
+    <p class="eyebrow">SUMBER ANGKA</p>
+    <h2 id="source-title">Rincian sumber</h2>
+    <div id="source-detail"></div>
+  </dialog>
+  <script type="module" src="/inventory-reports.js"></script>
+</body>
+</html>

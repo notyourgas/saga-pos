@@ -1,0 +1,79 @@
+.saga-ui-system {
+  --saga-ui-ink: var(--ink, #241a14);
+  --saga-ui-muted: var(--muted, #5e5249);
+  --saga-ui-line: var(--line, #d8cdbd);
+  --saga-ui-paper: var(--surface, #fffdf8);
+  --saga-ui-accent: var(--orange-dark, #963609);
+  --saga-ui-focus: #1570a2;
+  color: var(--saga-ui-ink);
+  font-family: "Plus Jakarta Sans", Inter, "Segoe UI", sans-serif;
+}
+
+.saga-ui-system *, .saga-ui-system *::before, .saga-ui-system *::after { box-sizing: border-box; }
+.saga-ui-system :focus-visible { outline: 4px solid var(--saga-ui-focus); outline-offset: 3px; }
+
+.saga-report-shell { display: grid; gap: 1rem; min-width: 0; padding: clamp(1rem, 2vw, 1.5rem); border: 1px solid var(--saga-ui-line); border-radius: 18px; background: var(--saga-ui-paper); }
+.saga-report-shell > header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; }
+.saga-report-shell h2 { margin: 0; font-size: clamp(1.45rem, 4vw, 2rem); line-height: 1.1; }
+.saga-report-shell header p:last-child { max-width: 65ch; margin: .45rem 0 0; color: var(--saga-ui-muted); line-height: 1.55; }
+.saga-report-eyebrow { margin: 0 0 .35rem; color: var(--saga-ui-accent); font-size: .72rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.saga-report-metric { display: grid; gap: .35rem; min-width: min(100%, 240px); color: var(--saga-ui-muted); font-size: .78rem; font-weight: 800; }
+.saga-report-metric select { min-height: 46px; max-width: 100%; padding: .65rem 2.1rem .65rem .75rem; border: 1px solid var(--saga-ui-line); border-radius: 10px; background: white; color: var(--saga-ui-ink); font: inherit; }
+.saga-report-metadata { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 1px; overflow: hidden; margin: 0; border: 1px solid var(--saga-ui-line); border-radius: 12px; background: var(--saga-ui-line); }
+.saga-report-metadata div { min-width: 0; padding: .7rem .8rem; background: var(--saga-ui-paper); }
+.saga-report-metadata dt { color: var(--saga-ui-muted); font-size: .68rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.saga-report-metadata dd { overflow-wrap: anywhere; margin: .25rem 0 0; font-size: .86rem; font-weight: 750; }
+.saga-report-content { min-width: 0; }
+.saga-report-chart { margin: 0; padding: 1rem; border: 1px solid var(--saga-ui-line); border-radius: 12px; }
+.saga-report-chart figcaption { margin-bottom: 1rem; font-weight: 850; }
+.saga-report-chart ul { display: grid; gap: .75rem; margin: 0; padding: 0; list-style: none; }
+.saga-report-chart li { display: grid; grid-template-columns: minmax(8rem, 1fr) minmax(8rem, 3fr) minmax(5.5rem, auto); gap: .7rem; align-items: center; }
+.saga-report-chart li > span:first-child { overflow-wrap: anywhere; }
+.saga-report-chart strong { text-align: right; }
+.saga-report-bar-track { display: block; height: .72rem; overflow: hidden; border: 1px solid #cbbbaa; border-radius: 999px; background: #eee5d8; }
+.saga-report-bar-track > span { display: block; width: var(--saga-bar-size); height: 100%; background: repeating-linear-gradient(135deg, #2e6784 0 8px, #fff 8px 11px); }
+.saga-report-table-alternative { margin-top: 1rem; }
+.saga-report-table-alternative summary { width: fit-content; padding: .55rem 0; color: var(--saga-ui-accent); font-weight: 850; cursor: pointer; }
+.saga-report-table-region { max-width: 100%; overflow: auto; border: 1px solid var(--saga-ui-line); border-radius: 12px; }
+.saga-report-table-region table { width: 100%; min-width: 36rem; border-collapse: collapse; background: white; }
+.saga-report-table-region caption { padding: .75rem; color: var(--saga-ui-muted); font-size: .78rem; text-align: left; }
+.saga-report-table-region th, .saga-report-table-region td { padding: .75rem; border-top: 1px solid var(--saga-ui-line); text-align: left; vertical-align: top; }
+.saga-report-table-region thead th { background: #f3ece2; font-size: .75rem; letter-spacing: .025em; }
+.saga-report-table-region tbody th { font-weight: 800; }
+
+.saga-state-panel { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .9rem; align-items: start; min-height: 8rem; padding: 1rem; border: 2px solid var(--saga-state-border); border-radius: 12px; background: var(--saga-state-background); }
+.saga-state-panel h3 { margin: 0; font-size: 1.05rem; }
+.saga-state-panel p { max-width: 62ch; margin: .4rem 0 0; color: var(--saga-ui-muted); line-height: 1.55; }
+.saga-state-mark { display: block; width: 1rem; height: 1rem; margin-top: .15rem; border: 3px solid currentColor; border-radius: 50%; }
+.saga-state-loading { --saga-state-border: #9abbd0; --saga-state-background: #eef7fb; color: #1e5a78; }
+.saga-state-loading .saga-state-mark { border-right-color: transparent; animation: saga-ui-spin .8s linear infinite; }
+.saga-state-error { --saga-state-border: #c77c74; --saga-state-background: #fff1ef; color: #8f2f27; }
+.saga-state-error .saga-state-mark { border-radius: 2px; transform: rotate(45deg); }
+.saga-state-empty { --saga-state-border: #c7ae7e; --saga-state-background: #fff8e9; color: #704d14; }
+.saga-state-empty .saga-state-mark { border-style: dashed; }
+.saga-state-locked { --saga-state-border: #8379a9; --saga-state-background: #f4f1ff; color: #4d4274; }
+.saga-state-locked .saga-state-mark { border-radius: 3px 3px 6px 6px; }
+.saga-state-action { min-height: 44px; margin-top: .8rem; padding: .55rem .8rem; border: 2px solid currentColor; border-radius: 9px; background: white; color: inherit; font: inherit; font-weight: 850; }
+
+.saga-unsaved-dialog { width: min(32rem, calc(100% - 2rem)); padding: 0; border: 0; border-radius: 16px; color: var(--saga-ui-ink, #241a14); box-shadow: 0 24px 70px rgba(36, 26, 20, .28); }
+.saga-unsaved-dialog::backdrop { background: rgba(20, 14, 10, .58); }
+.saga-unsaved-dialog > div { padding: 1.2rem; }
+.saga-unsaved-dialog h2 { margin: 0; font-size: 1.35rem; }
+.saga-unsaved-dialog p { color: var(--saga-ui-muted, #5e5249); line-height: 1.55; }
+.saga-unsaved-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .6rem; }
+.saga-unsaved-actions button { min-height: 44px; padding: .6rem .85rem; border: 1px solid var(--saga-ui-line, #d8cdbd); border-radius: 9px; background: white; color: inherit; font: inherit; font-weight: 800; }
+.saga-unsaved-actions [data-discard] { border-color: #8f2f27; color: #8f2f27; }
+
+@keyframes saga-ui-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .saga-report-shell > header { align-items: stretch; }
+  .saga-report-metric { width: 100%; }
+  .saga-report-chart li { grid-template-columns: minmax(0, 1fr) auto; }
+  .saga-report-bar-track { grid-column: 1 / -1; grid-row: 2; }
+  .saga-state-panel { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saga-state-loading .saga-state-mark { animation: none; border-style: dashed; }
+}

@@ -1,0 +1,301 @@
+/* KopiSaga Ink & Paper — operational portrait kiosk. */
+:root {
+  --ink: #2f211b;
+  --espresso: #5b3826;
+  --roast: #6b432c;
+  --clay: #8a5738;
+  --lime: #fff8ee;
+  --butter: #e8d7c7;
+  --paper: #f2e6d6;
+  --milk: #fefefe;
+  --concrete: #d7c4b2;
+  --muted: #68584e;
+  --ks-coffee-hover: #4a2e20;
+  --ks-coffee-pressed: #3e261b;
+  --ks-focus: #8a5738;
+  --ks-motion-press: 110ms ease-out;
+  --ks-motion-ui: 180ms ease-out;
+  --short-shadow: 0 14px 30px rgba(74, 46, 32, .12);
+}
+
+html,
+body {
+  background: #24211f;
+}
+
+.kiosk-root {
+  background: var(--paper);
+}
+
+.environment-banner {
+  background: var(--ks-coffee-hover);
+  color: var(--lime);
+}
+
+.brand-wordmark {
+  display: grid;
+  width: 88px;
+  height: 72px;
+  place-items: center;
+  overflow: hidden;
+}
+
+.brand-wordmark img {
+  display: block;
+  width: 88px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.index-label {
+  border: 1px solid var(--espresso);
+  border-radius: 12px;
+  background: var(--espresso);
+  color: var(--lime);
+}
+
+.welcome-screen {
+  padding-bottom: max(96px, calc(56px + env(safe-area-inset-bottom)));
+}
+
+.welcome-layout {
+  flex: 0 1 auto;
+  grid-template-rows: auto auto;
+  gap: 26px;
+}
+
+.welcome-copy {
+  max-width: 900px;
+}
+
+.welcome-copy h1 {
+  max-width: 10ch;
+  font-size: clamp(76px, 8vw, 88px);
+  line-height: .96;
+  letter-spacing: -.05em;
+}
+
+.welcome-copy > p:not(.index-label) {
+  max-width: 44ch;
+  margin-top: 12px;
+  font-size: clamp(22px, 2.2vw, 26px);
+  line-height: 1.45;
+}
+
+.welcome-copy h1[tabindex="-1"]:focus {
+  outline: none;
+}
+
+.hero-drink {
+  width: 100%;
+  height: clamp(760px, 48dvh, 920px);
+  min-height: 0;
+  align-self: start;
+  border: 1px solid rgba(91, 56, 38, .24);
+  border-radius: 28px;
+  background: #e8d7c7;
+  box-shadow: var(--short-shadow);
+}
+
+.hero-drink-picture::after {
+  background: linear-gradient(180deg, transparent 72%, rgba(6, 6, 6, .16));
+}
+
+.hero-drink-image {
+  object-position: center 58%;
+}
+
+.welcome-screen > .screen-action-stack {
+  margin-top: 30px;
+  padding-top: 0;
+}
+
+.welcome-screen .primary-action {
+  min-height: clamp(84px, 8vw, 96px);
+  border-color: var(--espresso);
+  border-radius: 22px;
+  background: var(--espresso);
+  color: var(--lime);
+}
+
+.primary-action .action-icon {
+  width: clamp(48px, 5vw, 54px);
+  flex: 0 0 auto;
+  border: 1px solid rgba(91, 56, 38, .18);
+  background: var(--lime);
+  color: var(--espresso);
+}
+
+.primary-action .action-icon .icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.4;
+  transform: translateX(1px);
+}
+
+.choice-card.is-selected,
+.payment-method-card.is-selected {
+  border-color: var(--espresso);
+  background: var(--espresso);
+  color: var(--lime);
+}
+
+.choice-card.is-selected .selection-mark,
+.payment-method-card.is-selected .selection-mark {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--espresso);
+}
+
+.kiosk-screen.is-entering {
+  animation: ks-kiosk-screen-enter 180ms ease-out;
+}
+
+.kiosk-screen.is-entering.payment-pending-screen {
+  animation: none;
+}
+
+.primary-action,
+.secondary-action,
+.icon-text-action,
+.help-button,
+.choice-card,
+.payment-method-card,
+.category-rail button,
+.product-card,
+.cart-dock button,
+.option-chip,
+.modifier-option {
+  transition: transform var(--ks-motion-press), border-color var(--ks-motion-ui), background-color var(--ks-motion-ui), color var(--ks-motion-ui), box-shadow var(--ks-motion-ui);
+}
+
+.secondary-action,
+.icon-text-action,
+.help-button {
+  border-color: rgba(91, 56, 38, .28);
+  color: var(--espresso);
+}
+
+.choice-card,
+.payment-method-card,
+.product-card,
+.modifier-hero,
+.review-card {
+  border-color: rgba(91, 56, 38, .24);
+  background: rgba(255, 248, 238, .86);
+}
+
+.product-card,
+.browse-context-card,
+.cart-dock,
+.cart-dock button {
+  border-radius: 22px;
+}
+
+.category-rail button[aria-current="true"] {
+  border-color: var(--espresso);
+  background: #e8d7c7;
+  box-shadow: 0 10px 24px rgba(91, 56, 38, .14);
+}
+
+.category-rail button[aria-current="true"] .category-name {
+  background: var(--espresso);
+  color: var(--lime);
+}
+
+.add-control,
+.cart-dock button {
+  background: var(--lime);
+  color: var(--espresso);
+}
+
+.cart-dock {
+  background: var(--ks-coffee-hover);
+  color: var(--lime);
+}
+
+.option-chip.is-selected,
+.payment-method-switch button.is-selected,
+.cash-assist-options button.is-selected {
+  border-color: var(--espresso);
+  background: var(--espresso);
+  color: var(--lime);
+}
+
+.cash-assist-options button.is-selected small {
+  color: var(--lime);
+}
+
+@keyframes ks-kiosk-screen-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .primary-action:hover,
+  .choice-card.is-selected:hover,
+  .payment-method-card.is-selected:hover {
+    background: var(--ks-coffee-hover);
+  }
+
+  .secondary-action:hover,
+  .icon-text-action:hover,
+  .help-button:hover,
+  .category-rail button:hover,
+  .product-card:hover {
+    border-color: var(--espresso);
+    box-shadow: var(--short-shadow);
+    transform: translateY(-2px);
+  }
+
+  .category-rail button[aria-current="true"]:hover {
+    transform: translateY(-1px);
+  }
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--ks-focus);
+  outline-offset: 4px;
+}
+
+@media (max-height: 1500px) {
+  .welcome-screen {
+    padding-bottom: 56px;
+  }
+
+  .welcome-copy h1 {
+    font-size: 68px;
+  }
+
+  .hero-drink {
+    height: 44dvh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  button:hover,
+  .product-card:hover,
+  .kiosk-screen.is-entering {
+    transform: none !important;
+  }
+}

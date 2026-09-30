@@ -1,0 +1,33 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "SagaOPS API", "version": "1.0.0" },
+  "paths": {
+    "/health": { "get": { "operationId": "getHealth", "responses": { "200": { "description": "Healthy" }, "426": { "$ref": "#/components/responses/UnsupportedVersion" } } } },
+    "/ready": { "get": { "operationId": "getReadiness", "responses": { "200": { "description": "Ready" }, "426": { "$ref": "#/components/responses/UnsupportedVersion" } } } },
+    "/api/v1/pos/checkouts": {
+      "post": {
+        "operationId": "submitPosCheckout",
+        "deprecated": true,
+        "x-sagapos-retired": true,
+        "description": "Retired legacy checkout surface. After contract and authentication checks, privacy-safe evidence is recorded before request-body parsing and the request receives 410 without creating orders, payments, or inventory movements. Use the canonical SagaPOS kiosk/cashier runtime.",
+        "x-sagapos-external-traffic": "UNVERIFIED",
+        "parameters": [{ "$ref": "#/components/parameters/ContractVersion" }],
+        "responses": {
+          "401": { "$ref": "#/components/responses/ApiError" },
+          "410": { "$ref": "#/components/responses/Retired" },
+          "426": { "$ref": "#/components/responses/UnsupportedVersion" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "ContractVersion": { "name": "X-Saga-Contract-Version", "in": "header", "required": true, "schema": { "type": "string", "const": "1" } }
+    },
+    "responses": {
+      "ApiError": { "description": "Versioned safe error envelope" },
+      "Retired": { "description": "Legacy checkout retired before body parsing or business mutation.", "headers": { "x-saga-contract-version": { "schema": { "type": "string", "const": "1" } } } },
+      "UnsupportedVersion": { "description": "Unsupported API contract version" }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f6f0e7">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Kopi Saga · Kiosk Simulator</title>
+  <link rel="stylesheet" href="/table-order.css">
+  <link rel="stylesheet" href="/order-reference-v2.css">
+  <link rel="stylesheet" href="/order-reference-parity-v3.css">
+  <link rel="stylesheet" href="/kiosk-production-flow.css">
+  <link rel="stylesheet" href="/kiosk-portrait-32.css">
+  <link rel="stylesheet" href="/kopisaga-order-v4.css">
+</head>
+<body data-order-surface="kiosk">
+  <a class="skip-link" href="#app">Lewati ke menu</a>
+  <header class="topbar"><div class="brand"><img src="/assets/brand/kopi-saga-logo-cream-v1.svg" alt="Kopi Saga" width="1087" height="850"></div><div class="table-chip" id="table-chip"><span>Mode</span><strong id="table-label">Kiosk Demo</strong></div></header>
+  <div class="demo-banner" role="status">SIMULASI KIOSK · TIDAK ADA UANG, STOK, ATAU LAPORAN BISNIS YANG BERUBAH</div>
+  <main id="app" tabindex="-1" aria-live="polite"><section class="loading-state"><span class="spinner" aria-hidden="true"></span><p>Menyiapkan kiosk demo…</p></section></main>
+  <dialog id="order-product-dialog" class="order-product-dialog" aria-labelledby="order-product-title" aria-modal="true"><div id="order-product-content"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="/table-order.js"></script>
+</body>
+</html>

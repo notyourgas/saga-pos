@@ -1,0 +1,37 @@
+{
+  "version": 3,
+  "generatedWith": "Original synthetic SVG placeholder generation",
+  "reviewContract": "Clearly synthetic labeled vector placeholders for development; no original menu photography or generated reference imagery redistributed.",
+  "dimensions": {
+    "width": 640,
+    "height": 640,
+    "format": "SVG"
+  },
+  "assetBudgetBytes": 600000,
+  "illustrativeDummyAssets": [
+    {
+      "productId": "creamcheese-bagel",
+      "file": "creamcheese-bagel-dummy-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "strawberry-bagel",
+      "file": "strawberry-bagel-dummy-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "ham-fresh-bagel",
+      "file": "ham-fresh-bagel-dummy-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "moka-bagel",
+      "file": "moka-bagel-dummy-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    }
+  ]
+}

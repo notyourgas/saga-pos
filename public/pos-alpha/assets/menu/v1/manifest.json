@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "generatedWith": "Original synthetic SVG placeholder generation",
+  "reviewContract": "Clearly synthetic labeled vector placeholders for development; no original menu photography or generated reference imagery redistributed.",
+  "candidateAssets": [
+    {
+      "productId": "americano",
+      "file": "americano-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "cafe-latte",
+      "file": "cafe-latte-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "cappucino",
+      "file": "cappucino-v2.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "moccacino",
+      "file": "moccacino-v2.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "matcha",
+      "file": "matcha-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "chocolate",
+      "file": "chocolate-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "red-velvet",
+      "file": "red-velvet-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "lychee-ti",
+      "file": "lychee-ti-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    },
+    {
+      "productId": "lemon-ti",
+      "file": "lemon-ti-v1.svg",
+      "status": "SYNTHETIC_DEMO_PLACEHOLDER",
+      "visualCue": "Synthetic demo cup illustration; does not depict the actual product"
+    }
+  ],
+  "fallbackAssets": [
+    {
+      "productId": "es-kopi-saga",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    },
+    {
+      "productId": "saga-premiyum",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    },
+    {
+      "productId": "magnosiyum",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    },
+    {
+      "productId": "brr-patabim",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    },
+    {
+      "productId": "tralalelow",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    },
+    {
+      "productId": "si-biyu",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    },
+    {
+      "productId": "oyen-sunkist",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    },
+    {
+      "productId": "mohito",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    },
+    {
+      "productId": "range-bliss",
+      "status": "SUPERSEDED_BY_V2_ILLUSTRATIVE_DUMMY"
+    }
+  ],
+  "dimensions": {
+    "width": 640,
+    "height": 640,
+    "format": "SVG"
+  }
+}

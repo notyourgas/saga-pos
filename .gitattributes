@@ -1,0 +1,13 @@
+* text=auto eol=lf
+
+ops/private/* text eol=lf
+migrations/postgres/saga-pos-runtime-manifest.txt text eol=lf
+ops/production/*.sh text eol=lf
+ops/production/*.mjs text eol=lf
+ops/production/*.sql text eol=lf
+ops/production/*.service text eol=lf
+ops/production/*.timer text eol=lf
+ops/production/*.conf text eol=lf
+ops/production/*.py text eol=lf
+tests/bash/*.sh text eol=lf
+tests/release-content-adversarial.py text eol=lf

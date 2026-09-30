@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#17110e">
+  <title>Kopi Saga · Order dari Meja</title>
+  <link rel="stylesheet" href="/table-order.css">
+  <link rel="stylesheet" href="/order-reference-v2.css">
+  <link rel="stylesheet" href="/order-reference-parity-v3.css">
+  <link rel="stylesheet" href="/kopisaga-order-v4.css">
+</head>
+<body data-order-surface="table">
+  <a class="skip-link" href="#app">Lewati ke menu</a>
+  <header class="topbar">
+    <div class="brand"><img src="/assets/brand/kopi-saga-logo-cream-v1.svg" alt="Kopi Saga" width="1087" height="850"></div>
+    <div class="table-chip" id="table-chip" hidden><span>Meja</span><strong id="table-label">—</strong></div>
+  </header>
+  <div class="demo-banner" role="status">DEMO TERISOLASI · PEMBAYARAN NYATA NONAKTIF</div>
+  <main id="app" tabindex="-1" aria-live="polite">
+    <section class="loading-state"><span class="spinner" aria-hidden="true"></span><p>Memeriksa QR meja…</p></section>
+  </main>
+  <dialog id="order-product-dialog" class="order-product-dialog" aria-labelledby="order-product-title" aria-modal="true"><div id="order-product-content"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="/table-order.js"></script>
+</body>
+</html>

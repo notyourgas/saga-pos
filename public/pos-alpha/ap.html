@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Saga POS · Review AP</title><link rel="stylesheet" href="/pos-alpha.css"></head>
+<body class="operator-body surface-ap">
+  <a class="skip-link" href="#main-content">Lewati ke konten</a>
+  <header class="environment-banner"><span>LOCAL SPRINT LAB</span><span>Finance fixture · tidak membuat pembayaran</span></header>
+  <main id="main-content" class="operator-shell" tabindex="-1">
+    <section id="ap-login" class="operator-login"><div><p class="eyebrow">Accounts payable</p><h1>Review invoice</h1><p>Reviewer Finance memeriksa bukti match sebelum Owner memposting utang.</p></div><form id="login-form" class="login-card"><label>Organization<input name="organizationSlug" value="kopi-saga" required></label><label>Employee ID<input name="employeeId" value="FINANCE-01" required></label><label>Password sementara<input name="password" type="password" required></label><button class="button button-primary">Masuk Review AP</button><p id="login-status" class="form-status" role="alert"></p></form></section>
+    <section id="ap-app" hidden><header class="operator-header"><div><p class="eyebrow">Kopi Saga Salak · Finance</p><h1>Invoice approval</h1></div><div class="operator-context"><span id="actor-badge" class="count-pill"></span><button id="refresh-button" class="button button-secondary">Muat ulang</button><button id="logout-button" class="button button-ghost">Keluar</button></div></header><div id="ap-content" class="operator-content"></div></section>
+  </main>
+  <div id="global-status" class="toast" role="status" aria-atomic="true" hidden></div><script type="module" src="/ap.js"></script>
+</body>
+</html>

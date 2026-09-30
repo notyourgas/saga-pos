@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="420" viewBox="0 0 420 420" role="img" aria-label="QRIS DEMO bukan untuk pembayaran">
+  <rect width="420" height="420" rx="24" fill="#fff6e8"/>
+  <rect x="18" y="18" width="384" height="384" rx="18" fill="none" stroke="#9b3029" stroke-width="8"/>
+  <text x="210" y="171" fill="#9b3029" font-family="Arial,sans-serif" font-weight="800" font-size="48" text-anchor="middle">DEMO</text>
+  <text x="210" y="226" fill="#272522" font-family="Arial,sans-serif" font-weight="700" font-size="27" text-anchor="middle">BUKAN QRIS</text>
+  <text x="210" y="274" fill="#272522" font-family="Arial,sans-serif" font-size="20" text-anchor="middle">Jangan transfer uang</text>
+  <text x="210" y="309" fill="#272522" font-family="Arial,sans-serif" font-size="20" text-anchor="middle">Konfirmasi hanya simulasi</text>
+</svg>
