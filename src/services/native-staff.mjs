@@ -319,8 +319,8 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
       await tx.query("select set_config('app.native_roster_publish','authorized',true)");
       return (await tx.query(`insert into sagaops.shift_schedules(organization_id,outlet_id,staff_id,business_date,scheduled_start_at,scheduled_end_at,shift_name,notes,payroll_rate_type,payroll_rate_amount_rupiah)
         select $1,$2,p.id,$3::date,$4::timestamptz,$5::timestamptz,$6,$7,p.payroll_rate_type,p.payroll_rate_amount_rupiah
-        from sagaops.staff_profiles p join sagaops.native_staff_credentials c on c.staff_id=p.id
-        where p.id=$8 and p.organization_id=$1 and p.outlet_id=$2 and p.status='active' and p.employee_code is not null and c.state<>'suspended'
+        from sagaops.staff_profiles p
+        where p.id=$8 and p.organization_id=$1 and p.outlet_id=$2 and p.status='active' and p.employee_code is not null
         and not exists(select 1 from sagaops.shift_schedules s where s.staff_id=p.id and s.status='scheduled'
           and s.scheduled_start_at<$5::timestamptz and s.scheduled_end_at>$4::timestamptz)
         returning id,staff_id,shift_name,scheduled_start_at,scheduled_end_at,status,notes`, [org, outlet, businessDate, start, end, shiftName, notes ? clean(notes, 200) : null, id])).rows[0];
@@ -424,8 +424,8 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
   async function assignmentInputs(tx,period,{staffId,templateId,businessDate}) {
     const staff=requireId(staffId), template=requireId(templateId), date=rosterDate(businessDate);
     if(date<dbDate(period.period_start)||date>dbDate(period.period_end)) throw fail('roster_assignment_outside_period');
-    const person=(await tx.query(`select p.id,p.role from sagaops.staff_profiles p join sagaops.native_staff_credentials c on c.staff_id=p.id
-      where p.id=$1 and p.organization_id=$2 and p.outlet_id=$3 and p.status='active' and p.employee_code is not null and c.state<>'suspended'`,[staff,org,outlet])).rows[0];
+    const person=(await tx.query(`select p.id,p.role from sagaops.staff_profiles p
+      where p.id=$1 and p.organization_id=$2 and p.outlet_id=$3 and p.status='active' and p.employee_code is not null`,[staff,org,outlet])).rows[0];
     const shift=(await tx.query(`select * from sagaops.native_shift_templates where id=$1 and organization_id=$2 and outlet_id=$3 and state='active'`,[template,org,outlet])).rows[0];
     if(!person||!shift) throw fail('roster_staff_or_template_not_found',404);
     const requirements=Array.isArray(shift.role_requirements)?shift.role_requirements:[];
@@ -589,8 +589,8 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
       const period=await ensurePeriod(tx,input,{lock:true}); if(period.status!=='draft')throw fail('roster_period_locked',409);
       const rules=normalizeRules(period.rules), days=rosterDays(dbDate(period.period_start),dbDate(period.period_end));
       await tx.query(`delete from sagaops.native_roster_assignments where roster_period_id=$1 and source='generated' and locked=false and published_schedule_id is null`,[period.id]);
-      const people=(await tx.query(`select p.id,p.employee_code,p.role from sagaops.staff_profiles p join sagaops.native_staff_credentials c on c.staff_id=p.id
-        where p.organization_id=$1 and p.outlet_id=$2 and p.status='active' and p.employee_code is not null and c.state<>'suspended' order by p.employee_code,p.id`,[org,outlet])).rows;
+      const people=(await tx.query(`select p.id,p.employee_code,p.role from sagaops.staff_profiles p
+        where p.organization_id=$1 and p.outlet_id=$2 and p.status='active' and p.employee_code is not null order by p.employee_code,p.id`,[org,outlet])).rows;
       const templates=(await tx.query(`select * from sagaops.native_shift_templates where organization_id=$1 and outlet_id=$2 and state='active' order by start_time,code`,[org,outlet])).rows;
       const existing=(await tx.query(`select a.*,t.band from sagaops.native_roster_assignments a join sagaops.native_shift_templates t on t.id=a.shift_template_id where a.roster_period_id=$1 order by a.scheduled_start_at`,[period.id])).rows;
       const approvedAbsences=(await tx.query(`select staff_id,starts_at,ends_at,category from sagaops.native_staff_requests
@@ -776,8 +776,8 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
     const assignments=(await tx.query(`select * from sagaops.native_roster_assignments where roster_period_id=$1 order by business_date,scheduled_start_at${lockAssignments?' for update':''}`,[period.id])).rows;
     const conflicts=[],rules=normalizeRules(period.rules),days=rosterDays(dbDate(period.period_start),dbDate(period.period_end));
     const assigned=new Set(assignments.map(item=>`${item.staff_id}:${dbDate(item.business_date)}`));
-    const people=(await tx.query(`select p.id,p.employee_code from sagaops.staff_profiles p join sagaops.native_staff_credentials c on c.staff_id=p.id
-      where p.organization_id=$1 and p.outlet_id=$2 and p.status='active' and p.employee_code is not null and c.state<>'suspended'`,[org,outlet])).rows;
+    const people=(await tx.query(`select p.id,p.employee_code from sagaops.staff_profiles p
+      where p.organization_id=$1 and p.outlet_id=$2 and p.status='active' and p.employee_code is not null`,[org,outlet])).rows;
     const activeStaffIds=new Set(people.map((person)=>person.id)),plannedEntries=[];
     const manualAvailability=(await tx.query(`select a.staff_id,a.starts_at,a.ends_at from sagaops.native_staff_availability a join sagaops.staff_profiles p on p.id=a.staff_id
       where a.organization_id=$1 and a.outlet_id=$2 and p.status='active' and a.kind='unavailable' and a.note=$3
@@ -807,16 +807,16 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
     for(const item of uniquePlanned.values()){const peopleOff=dailyDaysOff.get(item.businessDate)??[];peopleOff.push(item.staffId);dailyDaysOff.set(item.businessDate,peopleOff);}
     for(const [businessDate,staffIds] of dailyDaysOff)if(staffIds.length>1)conflicts.push({businessDate,staffIds,code:'day_off_daily_limit_exceeded',severity:'error',blocking:true,count:staffIds.length,message:'Lebih dari satu orang memiliki libur terjadwal pada tanggal yang sama. Maksimal satu orang per hari.'});
     for(const row of assignments){
-      const eligibility=(await tx.query(`select p.role,c.state as credential_state,t.state as template_state,t.role_requirements
-        from sagaops.staff_profiles p join sagaops.native_staff_credentials c on c.staff_id=p.id
+      const eligibility=(await tx.query(`select p.role,t.state as template_state,t.role_requirements
+        from sagaops.staff_profiles p
         join sagaops.native_shift_templates t on t.id=$2 and t.organization_id=$3 and t.outlet_id=$4
         where p.id=$1 and p.organization_id=$3 and p.outlet_id=$4 and p.status='active'`,[row.staff_id,row.shift_template_id,org,outlet])).rows[0];
       const requirements=Array.isArray(eligibility?.role_requirements)?eligibility.role_requirements:[];
-      if(!eligibility||eligibility.credential_state==='suspended'||eligibility.template_state!=='active'||(requirements.length&&!requirements.some((entry)=>entry.role===eligibility.role))){
+      if(!eligibility||eligibility.template_state!=='active'||(requirements.length&&!requirements.some((entry)=>entry.role===eligibility.role))){
         conflicts.push({assignmentId:row.id,code:'assignment_no_longer_eligible'});
         continue;
       }
-      const candidate={staff:row.staff_id,startAt:row.scheduled_start_at,endAt:row.scheduled_end_at};
+      const candidate={staff:row.staff_id,date:dbDate(row.business_date),startAt:row.scheduled_start_at,endAt:row.scheduled_end_at};
       const found=await hardConflicts(tx,period,candidate,{excludeAssignmentId:row.id}); if(found.length)conflicts.push({assignmentId:row.id,codes:found});
     }
     const templates=(await tx.query(`select id,name,code,band,role_requirements from sagaops.native_shift_templates where organization_id=$1 and outlet_id=$2 and state='active'`,[org,outlet])).rows;
@@ -851,7 +851,19 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
   }
   async function publishRoster(input) {
     return db.transaction(async(tx)=>{
-      const period=await ensurePeriod(tx,input,{lock:true}); if(period.status!=='review')throw fail('roster_review_required',409);
+      // Serialize publication and replay only its unchanged published revision.
+      const period=await ensurePeriod(tx,{...input,expectedVersion:undefined},{lock:true});
+      if(period.status==='published'){
+        const publication=(await tx.query(`select details from sagaops.native_roster_audit_log
+          where roster_period_id=$1 and organization_id=$2 and outlet_id=$3 and action='published'
+          order by created_at desc,id desc limit 1`,[period.id,org,outlet])).rows[0]?.details;
+        const result=publication?.publicationResult;
+        if(!result||Number(period.version)!==Number(result.period.version))throw fail('roster_version_conflict',409);
+        if(input?.expectedVersion!=null&&![Number(publication.sourceVersion),Number(result.period.version)].includes(Number(input.expectedVersion)))throw fail('roster_version_conflict',409);
+        return result;
+      }
+      if(input?.expectedVersion!=null&&Number(input.expectedVersion)!==period.version)throw fail('roster_version_conflict',409);
+      if(period.status!=='review')throw fail('roster_review_required',409);
       const {assignments,conflicts}=await rosterValidation(tx,period,{lockAssignments:true});
       if(!assignments.length)throw fail('roster_empty',409);
       if(conflicts.length)throw Object.assign(fail('roster_publish_conflicts',409),{details:conflicts});
@@ -866,8 +878,9 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
         await tx.query(`update sagaops.native_roster_assignments set published_schedule_id=$2,locked=true,updated_at=now() where id=$1`,[row.id,schedule.id]);
       }
       const published=(await tx.query(`update sagaops.native_roster_periods set status='published',published_by=$2,published_at=now(),version=version+1,updated_at=now() where id=$1 returning *`,[period.id,ids.ownerProfileId])).rows[0];
-      await audit(tx,period.id,'published',{assignmentCount:assignments.length});
-      return {period:periodView(published),publishedSchedules:assignments.length};
+      const result=JSON.parse(JSON.stringify({period:periodView(published),publishedSchedules:assignments.length}));
+      await audit(tx,period.id,'published',{assignmentCount:assignments.length,sourceVersion:period.version,publicationResult:result});
+      return result;
     });
   }
   async function login({ employeeCode, password }) {
@@ -1264,8 +1277,23 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
     const operationalReady=storage.ready===true&&policy.enforcementState==='ACTIVE'&&(!policy.gpsRequired||coordinatesConfigured);
     return {ready:storage.ready===true,operationalReady,storage,policy:{version:policy.version,enforcementState:policy.enforcementState,gpsRequired:policy.gpsRequired,selfieRequired:policy.selfieRequired,coordinatesConfigured,geofenceAction:policy.geofenceAction,evidenceRetentionDays:policy.evidenceRetentionDays},reviewBacklog,durable:{challenges:Number(durable?.challenges??0),evidence:Number(durable?.evidence??0)},inMemory:{challenges:attendanceChallenges.size,evidence:attendanceEvidence.size}};
   }
+  function requestIdentity(staffId, key) {
+    if (typeof key !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(key)) throw fail('request_idempotency_key_invalid',422);
+    const hex=createHash('sha256').update(JSON.stringify(['staff-request-v1',org,outlet,staffId.toLowerCase(),key.toLowerCase()])).digest('hex');
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-8${hex.slice(13,16)}-a${hex.slice(17,20)}-${hex.slice(20,32)}`;
+  }
+  const requestReceipt=(row)=>({id:row.id,category:row.category,state:row.state,created_at:row.created_at});
+  async function requestOperationStatus(staffId,key) {
+    const id=requireId(staffId),requestId=requestIdentity(id,key);
+    return own(id,async tx=>{
+      const row=(await tx.query('select id,category,state,created_at from sagaops.native_staff_requests where id=$1 and organization_id=$2 and staff_id=$3',[requestId,org,id])).rows[0];
+      return {status:row?'COMMITTED':'NOT_FOUND',idempotencyKey:key.toLowerCase(),request:row?requestReceipt(row):null};
+    });
+  }
   async function submitRequest(staffId, input) {
     const id = requireId(staffId), category = input?.category, reason = clean(input?.reason,500);
+    const key=input?.idempotencyKey;
+    const requestId=key===undefined?randomUUID():requestIdentity(id,key);
     if (!categories.has(category) || reason.length < 10) throw fail('request_invalid');
     const scheduleId = input.scheduleId ? requireId(input.scheduleId) : null;
     const targetStaffId = category === 'shift_swap' ? requireId(input.targetStaffId) : null;
@@ -1274,8 +1302,20 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
     const endsAt = category === 'shift_swap' ? null : iso(input.endAt);
     if (startsAt && (Date.parse(endsAt)<=Date.parse(startsAt) || Date.parse(endsAt)-Date.parse(startsAt)>31*24*60*60_000)) throw fail('request_range_invalid');
     if (category === 'overtime' && !scheduleId) throw fail('overtime_schedule_required');
-    if (category === 'shift_swap' && (!scheduleId || targetStaffId === id || !(await db.query(`select id from sagaops.shift_schedules where id=$1 and staff_id=$2 and organization_id=$3 and outlet_id=$4 and status='scheduled'`,[targetScheduleId,targetStaffId,org,outlet])).rows.length)) throw fail('swap_target_invalid');
+    const swapTargetValid=category!=='shift_swap'||(scheduleId && targetStaffId!==id && (await db.query(`select id from sagaops.shift_schedules where id=$1 and staff_id=$2 and organization_id=$3 and outlet_id=$4 and status='scheduled'`,[targetScheduleId,targetStaffId,org,outlet])).rows.length>0);
     return own(id, async (tx) => {
+      if(!(await tx.query('select id from sagaops.staff_profiles where id=$1 and organization_id=$2 and outlet_id=$3',[id,org,outlet])).rows.length) throw fail('staff_not_found',404);
+      // The unique primary key serializes concurrent attempts. Validation and insert
+      // share this transaction: a rejected attempt leaves no durable reservation.
+      const inserted=(await tx.query(`insert into sagaops.native_staff_requests(id,organization_id,staff_id,schedule_id,target_staff_id,target_schedule_id,category,reason,starts_at,ends_at)
+        values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) on conflict(id) do nothing returning *`,[requestId,org,id,scheduleId,targetStaffId,targetScheduleId,category,reason,startsAt,endsAt])).rows[0];
+      if(!inserted){
+        const existing=(await tx.query('select * from sagaops.native_staff_requests where id=$1 and organization_id=$2 and staff_id=$3',[requestId,org,id])).rows[0];
+        const dateValue=value=>value?new Date(value).toISOString():null;
+        if(!existing || existing.category!==category || existing.reason!==reason || existing.schedule_id!==scheduleId || existing.target_staff_id!==targetStaffId || existing.target_schedule_id!==targetScheduleId || dateValue(existing.starts_at)!==startsAt || dateValue(existing.ends_at)!==endsAt) throw fail('request_idempotency_conflict',409);
+        return {...requestReceipt(existing),idempotencyKey:key.toLowerCase(),replayed:true};
+      }
+      if(!swapTargetValid) throw fail('swap_target_invalid');
       if (scheduleId && !(await tx.query(`select id from sagaops.shift_schedules where id=$1 and staff_id=$2 and organization_id=$3 and outlet_id=$4 and status='scheduled'`, [scheduleId,id,org,outlet])).rows.length) throw fail('schedule_not_found',404);
       if (category === 'overtime') {
         const eligible=(await tx.query(`select s.scheduled_end_at,a.check_out_at,a.overtime_candidate_minutes,a.approved_overtime_minutes
@@ -1283,12 +1323,10 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
           where s.id=$1 and s.staff_id=$2 and s.organization_id=$3 and s.outlet_id=$4 and s.status='scheduled' and a.check_out_at is not null
           for update of a`,[scheduleId,id,org,outlet])).rows[0];
         validateOvertimeRequest(eligible,startsAt,endsAt);
-        const duplicate=(await tx.query(`select 1 from sagaops.native_staff_requests where organization_id=$1 and staff_id=$2 and schedule_id=$3 and category='overtime' and state in ('submitted','approved') limit 1`,[org,id,scheduleId])).rows[0];
+        const duplicate=(await tx.query(`select 1 from sagaops.native_staff_requests where organization_id=$1 and staff_id=$2 and schedule_id=$3 and category='overtime' and state in ('submitted','approved') and id<>$4 limit 1`,[org,id,scheduleId,requestId])).rows[0];
         if(duplicate)throw fail('overtime_request_exists',409);
       }
-      const row = (await tx.query(`insert into sagaops.native_staff_requests(organization_id,staff_id,schedule_id,target_staff_id,target_schedule_id,category,reason,starts_at,ends_at)
-        values($1,$2,$3,$4,$5,$6,$7,$8,$9) returning id,category,state,created_at`, [org,id,scheduleId,targetStaffId,targetScheduleId,category,reason,startsAt,endsAt])).rows[0];
-      return row;
+      return {...requestReceipt(inserted),...(key===undefined?{}:{idempotencyKey:key.toLowerCase(),replayed:false})};
     });
   }
   async function peerDecision(staffId, requestId, accept) {
@@ -1372,7 +1410,7 @@ export function createNativeStaffService({ db, ids, clock = () => new Date(), at
     createShiftTemplate,updateShiftTemplate,setShiftTemplateState,loadRoster,saveRosterAssignment,bulkAssignRoster,copyRosterPattern,
     saveRosterRules,generateRoster,publishRoster,setRosterStatus,saveAvailability,
     login,validateSession,changePassword,home,listSchedules,getSchedule,listRequests,getRequest,attendanceEligibility,attendanceOperationStatus,prepareAttendance,initializeAttendanceEvidence,uploadAttendanceEvidence,health,
-    clockIn,clockOut,submitAttendanceCorrection,saveAttendancePolicy,reviewAttendance,openAttendanceEvidence,submitRequest,peerDecision,reviewRequest };
+    clockIn,clockOut,submitAttendanceCorrection,saveAttendancePolicy,reviewAttendance,openAttendanceEvidence,submitRequest,requestOperationStatus,peerDecision,reviewRequest };
 }
 
 function staffDateRange(from,to,clock){

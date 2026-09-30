@@ -3,6 +3,7 @@ const SHELL = Object.freeze([
   '/staff',
   '/staff-native.css',
   '/staff.js',
+  '/ui/staff-request-attempt.js',
   '/staff.webmanifest',
   '/staff-app-icon.svg',
 ]);

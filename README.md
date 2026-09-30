@@ -22,7 +22,9 @@ For cloud validation, use the environment's port forwarding for the local server
 
 ## Validation and assets
 
-`npm run check` checks module syntax, TypeScript, OpenAPI contracts and migration markers. `npm test` exercises HTTP surfaces, menu catalog, generated placeholder assets and owner authentication with a random test-only password. This is a package smoke test, not the private repository's complete acceptance suite.
+`npm run check` checks module syntax, TypeScript, OpenAPI contracts and migration markers. `npm test` exercises HTTP surfaces, canonical menu customization labels/minimums, generated assets, offline-shell assets, authentication, native request key enforcement and lookup routing, request recovery/privacy state, database-backed idempotency and roster integrity with synthetic fixtures. Test accounts and passwords are generated locally; no real employee/customer records are included. This package suite does not establish that the full private acceptance suite or production integrations pass.
+
+Staff request POSTs require an idempotency key. The browser preserves operation metadata in local storage and keeps the sensitive draft only in session storage. After an uncertain result, recovery checks the server before replaying the same key and frozen payload. If the session payload is missing and the server reports `NOT_FOUND`, manual resolution is required; the client does not blindly resend or start a replacement attempt. Deployment ingress is excluded; a separately configured ingress must allow `/ui/staff-request-attempt.js` alongside the Staff UI.
 
 Product and brand media have been replaced by original SVG illustrations marked **SYNTHETIC DEMO**. System fonts replace omitted binary fonts; upstream font notices remain for attribution. External business endpoints are examples under `example.invalid`; configure legitimate integrations separately.
 

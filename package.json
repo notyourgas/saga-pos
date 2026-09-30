@@ -9,7 +9,7 @@
     "pos:alpha:start": "node scripts/serve-pos-alpha.mjs",
     "pos:durable:start": "node scripts/serve-pos-durable.mjs",
     "uat:start": "node scripts/serve-uat.mjs",
-    "test": "node --test tests/public-snapshot.test.mjs",
+    "test": "node --test --test-concurrency=2 tests/*.test.mjs",
     "test:all": "npm run check && npm test"
   },
   "dependencies": {

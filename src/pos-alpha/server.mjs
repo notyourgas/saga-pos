@@ -476,11 +476,19 @@ export function createPosAlphaServer({ sharedPassword = randomBytes(9).toString(
           if (url.search) throw apiError('request_invalid',422);
           return streamReceiptEvidence(res,await staffInventoryReceiving.service.openEvidence(receivingContext,staffEvidenceMatch[1],staffEvidenceMatch[2] ?? staffEvidenceMatch[3]));
         }
+        if(req.method==='GET' && url.pathname==='/api/staff/native/request-operation') {
+          if([...url.searchParams.keys()].some(key=>key!=='idempotencyKey')||url.searchParams.getAll('idempotencyKey').length!==1) throw apiError('request_idempotency_key_invalid',422);
+          return json(res,200,{data:await nativeStaff.requestOperationStatus(session.subject.staffId,url.searchParams.get('idempotencyKey'))});
+        }
         if (url.search) throw apiError('request_invalid',422);
         if (req.method === 'POST' && url.pathname === '/api/staff/native/clock-in') { attendanceMutationLimiter.consume(`staff-attendance:${session.subject.staffId}:${clientKey(req)}`); return json(res,200,{ data:await nativeStaff.clockIn(session.subject.staffId,{...(await readJson(req)),sessionBinding:session.tokenHash}) }); }
         if (req.method === 'POST' && url.pathname === '/api/staff/native/clock-out') { attendanceMutationLimiter.consume(`staff-attendance:${session.subject.staffId}:${clientKey(req)}`); return json(res,200,{ data:await nativeStaff.clockOut(session.subject.staffId,{...(await readJson(req)),sessionBinding:session.tokenHash}) }); }
         if (req.method === 'POST' && ['/api/staff/native/attendance/correction','/api/staff/native/attendance/correction-request'].includes(url.pathname)) { attendanceCorrectionLimiter.consume(`staff-attendance-correction:${session.subject.staffId}:${clientKey(req)}`); return json(res,201,{data:await nativeStaff.submitAttendanceCorrection(session.subject.staffId,await readJson(req))}); }
-        if (req.method === 'POST' && url.pathname === '/api/staff/native/request') return json(res,201,{ data:await nativeStaff.submitRequest(session.subject.staffId,await readJson(req)) });
+        if (req.method === 'POST' && url.pathname === '/api/staff/native/request') {
+          const body=await readJson(req);
+          if(typeof body.idempotencyKey!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.idempotencyKey)) throw apiError('request_idempotency_key_invalid',422);
+          return json(res,201,{data:await nativeStaff.submitRequest(session.subject.staffId,body)});
+        }
         if (req.method === 'POST' && url.pathname === '/api/staff/native/peer-decision') {
           const body = await readJson(req);
           return json(res,200,{ data:await nativeStaff.peerDecision(session.subject.staffId,body.requestId,body.accept===true) });
@@ -1940,9 +1948,9 @@ function menuCatalogState(runtime, context, clock) {
       alternativeProductIds: details?.alternativeProductIds ?? [],
       nutritionEstimate: details?.nutritionEstimate ?? null,
       customizations: [...(product.variantGroups ?? []), ...(product.modifierGroups ?? [])].map((group) => ({
-        name: group.name,
-        required: group.required === true || Number(group.minSelections ?? 0) > 0,
-        options: (group.options ?? []).map((option) => ({ name: option.name, priceDeltaRupiah: Number(option.priceDeltaRupiah ?? option.priceRupiah ?? 0) })),
+        name: group.label ?? group.name,
+        required: group.required === true || Number(group.min ?? group.minSelections ?? 0) > 0,
+        options: (group.options ?? []).map((option) => ({ name: option.label ?? option.name, priceDeltaRupiah: Number(option.priceDeltaRupiah ?? option.priceRupiah ?? 0) })),
       })),
     };
     }),

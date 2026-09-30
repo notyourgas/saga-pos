@@ -34,3 +34,6 @@
 .review-facts>div,.detail-content dl div>*{min-width:0}
 
 .request-feedback{margin:0;padding:12px 14px;border:1px solid var(--saga-border);border-radius:14px;background:#f8f6f3;color:var(--saga-text);font-size:14px;line-height:20px;overflow-wrap:anywhere}.request-feedback[data-danger=true]{border-color:#d8aaa6;background:#fff7f6;color:var(--saga-danger)}.request-feedback:focus{outline:2px solid var(--saga-primary);outline-offset:2px}#request-list-feedback{margin-top:14px}#request-form [aria-invalid=true]{border-color:var(--saga-danger)}
+
+.request-recovery-actions{display:grid;gap:10px}.request-recovery-actions button{width:100%}
+.request-payload-missing>label,.request-payload-missing>#request-range-field{display:none}

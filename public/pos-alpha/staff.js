@@ -1,8 +1,10 @@
+import { createRequestAttempt, clearRequestDrafts, sanitizeRequestAttempts, requestRejectionCodes } from './ui/staff-request-attempt.js';
 const $ = (id) => document.getElementById(id);
 const SVG_NS='http://www.w3.org/2000/svg';
 function featherIcon(name){const svg=document.createElementNS(SVG_NS,'svg'),use=document.createElementNS(SVG_NS,'use');svg.classList.add('feather');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');use.setAttribute('href',`#feather-${name}`);svg.append(use);return svg;}
 function setIconText(element,label,iconName=null,{leading=false}={}){const text=document.createTextNode(label);element.replaceChildren();if(leading&&iconName)element.append(featherIcon(iconName));element.append(text);if(!leading&&iconName)element.append(featherIcon(iconName));}
 let csrf = '', subject = null, home = null, pending = false;
+let requestController=null,requestActorId=null;
 const RECEIVING_DB='sagapos-staff-receiving-v1',PHOTO_STORE='photo-queue',ATTENDANCE_PENDING_TTL_MS=24*60*60_000;
 const STAFF_APP_VERSION='2026.09.20-attendance-v2',DEVICE_ONBOARDING_KEY='sagapos-staff-device-ready-v2';
 const durableWrites=new Set();
@@ -134,7 +136,7 @@ function render() {
   refreshRequestSchedules();fillSelect($('swap-target'),home.swapTargets.map((entry)=>({value:entry.schedule_id,label:`${entry.staff_name} · ${entry.shift_name} · ${format(entry.scheduled_start_at)}`})));renderRequests();const waiting=home.requests.filter((entry)=>entry.state==='submitted').length;setIconText($('request-summary'),waiting?`${waiting} menunggu`:'Lihat pengajuan','arrow-right');
 }
 async function refresh({skipAttendanceRecovery=false}={}) { const response=await api('home');home=response.data;csrf=response.csrfToken;render();await loadAttendanceEligibility();if(!skipAttendanceRecovery)await recoverPendingAttendanceOperation();status('Data terbaru berhasil dimuat.'); }
-async function authenticate() { try{const response=await api('session');csrf=response.csrfToken;subject=response.staff;applyCapabilities(response.capabilities,response.staff?.capabilities);if(subject.passwordChangeRequired){show('password');status('Ganti password sementara untuk melanjutkan.');return;}show('workspace');await refresh();restoreRoute();await inspectDevicePermissions();renderInstallChoice();}catch(error){csrf='';subject=null;home=null;resetReceiving();show('login');status(error.status===401?'Masuk dengan Employee ID dan password karyawan.':'Portal belum tersedia. Coba lagi nanti.',error.status!==401);} }
+async function authenticate() { try{const response=await api('session');csrf=response.csrfToken;subject=response.staff;applyCapabilities(response.capabilities,response.staff?.capabilities);if(subject.passwordChangeRequired){show('password');status('Ganti password sementara untuk melanjutkan.');return;}show('workspace');await refresh();initializeRequestAttempt();restoreRoute();if(unresolvedRequest()&&requestController.snapshot().state!=='BLOCKED'){const controller=requestController;const result=await controller.check();if(requestController===controller)await completeRequestAttempt(result);}await inspectDevicePermissions();renderInstallChoice();}catch(error){csrf='';subject=null;home=null;clearRequestAttemptView();resetReceiving();show('login');status(error.status===401?'Masuk dengan Employee ID dan password karyawan.':'Portal belum tersedia. Coba lagi nanti.',error.status!==401);} }
 async function run(task) { if(pending)return;pending=true;try{await task();}catch(error){status(error.message||'Belum berhasil. Muat ulang sebelum mencoba lagi.',true);if(error.status===401&&subject)await authenticate();}finally{pending=false;} }
 function distanceMeters(from,to) { if(!from||!to||!Number.isFinite(Number(to.latitude??to.lat))||!Number.isFinite(Number(to.longitude??to.lng)))return null;const radians=(value)=>Number(value)*Math.PI/180,a=radians(from.latitude),b=radians(to.latitude),deltaLat=b-a,deltaLng=radians(to.longitude??to.lng)-radians(from.longitude),value=Math.sin(deltaLat/2)**2+Math.cos(a)*Math.cos(b)*Math.sin(deltaLng/2)**2;return 6_371_000*2*Math.atan2(Math.sqrt(value),Math.sqrt(1-value)); }
 async function getAttendanceCoordinates() {
@@ -245,13 +247,13 @@ async function refreshReceiptHistory() { const result=await api('inventory-recei
 function activateView(name,{push=true}={}) { if(name==='receiving'&&!receiving.enabled)return;setFocusMode(false);ui.view=name;document.querySelectorAll('.staff-nav [data-view]').forEach((item)=>item.setAttribute('aria-current',item.dataset.view===name?'page':'false'));for(const viewName of['today','schedules','requests','receiving'])$(`${viewName}-view`).hidden=viewName!==name;$('request-list-screen').hidden=false;$('request-form-screen').hidden=true;$('receipt-list-screen').hidden=false;$('receipt-form-screen').hidden=true;if(name==='today')renderAttendance();else setScreenState(name==='schedules'?(ui.scheduleMode==='history'?'06':'05'):name==='requests'?'07':'09');if(name==='receiving')void loadReceiving();if(push){const url=new URL(location.href);url.searchParams.set('view',name);url.searchParams.delete('screen');history.pushState({view:name},'',url);}window.scrollTo({top:0});}
 function setScheduleMode(mode){ui.scheduleMode=mode;$('schedule-tab').setAttribute('aria-selected',String(mode==='schedule'));$('history-tab').setAttribute('aria-selected',String(mode==='history'));$('schedule-panel').hidden=mode!=='schedule';$('history-panel').hidden=mode!=='history';setScreenState(mode==='history'?'06':'05');}
 function selectRequestType(category,{push=true}={}){const copy=category==='shift_swap'?['Tukar shift','Pilih shift milikmu dan rekan.']:category==='overtime'?['Ajukan lembur','Lengkapi waktu dan alasan lemburmu.']:['Buat pengajuan',`Lengkapi detail ${category==='permission'?'izin':requestTypeLabels[category].toLowerCase()}mu.`];document.activeElement?.blur();$('request-category').value=category;$('request-type-grid').hidden=true;$('request-form').hidden=false;updateRequestFields();$('request-form-title').textContent=copy[0];$('request-form-subtitle').textContent=copy[1];document.querySelectorAll('[data-request-type]').forEach((button)=>button.setAttribute('aria-pressed',String(button.dataset.requestType===category)));setScreenState(category==='shift_swap'?'22':category==='overtime'?'23':'08');if(push){const url=new URL(location.href);url.searchParams.set('view','requests');url.searchParams.set('screen',category);history.pushState({view:'requests',screen:category},'',url);}window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));}
-function openRequestForm(category=null,{push=true}={}){activateView('requests',{push:false});setFocusMode(true);$('request-list-screen').hidden=true;$('request-form-screen').hidden=false;$('request-type-grid').hidden=false;$('request-form').hidden=true;$('request-form-title').textContent='Pilih pengajuan';$('request-form-subtitle').textContent='Pilih sesuai kebutuhanmu.';document.querySelectorAll('[data-request-type]').forEach((button)=>button.setAttribute('aria-pressed','false'));setScreenState('21');if(category&&requestTypeLabels[category])selectRequestType(category,{push:false});if(push){const url=new URL(location.href);url.searchParams.set('view','requests');url.searchParams.set('screen',category||'new');history.pushState({view:'requests',screen:category||'new'},'',url);}window.scrollTo({top:0});}
+function openRequestForm(category=null,{push=true}={}){if(unresolvedRequest())category=requestController.snapshot().attempt?.input?.category||'permission';activateView('requests',{push:false});setFocusMode(true);$('request-list-screen').hidden=true;$('request-form-screen').hidden=false;$('request-type-grid').hidden=false;$('request-form').hidden=true;$('request-form-title').textContent='Pilih pengajuan';$('request-form-subtitle').textContent='Pilih sesuai kebutuhanmu.';document.querySelectorAll('[data-request-type]').forEach((button)=>button.setAttribute('aria-pressed','false'));setScreenState('21');if(category&&requestTypeLabels[category])selectRequestType(category,{push:false});if(push){const url=new URL(location.href);url.searchParams.set('view','requests');url.searchParams.set('screen',category||'new');history.pushState({view:'requests',screen:category||'new'},'',url);}if(unresolvedRequest()){fillPendingRequest();renderRequestAttempt(requestController.snapshot());}window.scrollTo({top:0});}
 function closeRequestForm(options={}){const force=options?.force===true;if(!force&&!$('request-form').hidden&&$('request-form').matches(':focus-within')&&!confirm('Kembali ke daftar? Data yang belum dikirim akan tetap ada selama halaman ini terbuka.'))return;setFocusMode(false);$('request-list-screen').hidden=false;$('request-form-screen').hidden=true;setScreenState('07');const url=new URL(location.href);url.searchParams.set('view','requests');url.searchParams.delete('screen');history.replaceState({view:'requests'},'',url);}
 function setReceiptStep(step,{push=true}={}){setFocusMode(true);ui.receiptStep=Number(step);$('receipt-list-screen').hidden=true;$('receipt-form-screen').hidden=false;document.querySelectorAll('[data-receipt-step]').forEach((panel)=>panel.hidden=Number(panel.dataset.receiptStep)!==ui.receiptStep);document.querySelectorAll('.receipt-stepper li').forEach((item)=>{const number=Number(item.dataset.step),marker=item.querySelector('span'),complete=number<ui.receiptStep;if(number===ui.receiptStep)item.setAttribute('aria-current','step');else item.removeAttribute('aria-current');item.dataset.complete=String(complete);marker.replaceChildren(complete?featherIcon('check'):document.createTextNode(String(number)));});const titles={1:['Informasi kiriman','Lengkapi informasi barang yang datang.'],2:['Barang diterima','Masukkan bahan dan jumlah yang diterima.'],3:['Periksa kiriman','Pastikan data penerimaan sudah sesuai.']};[$('receipt-step-title').textContent,$('receipt-step-subtitle').textContent]=titles[ui.receiptStep];setScreenState(String(9+ui.receiptStep).padStart(2,'0'));if(push){const url=new URL(location.href);url.searchParams.set('view','receiving');url.searchParams.set('screen',`receipt-${ui.receiptStep}`);history.pushState({view:'receiving',screen:`receipt-${ui.receiptStep}`},'',url);}window.scrollTo({top:0});}
 
 $('login-form').addEventListener('submit',(event)=>{event.preventDefault();void run(async()=>{const fields=Object.fromEntries(new FormData(event.target));const result=await api('login',fields);csrf=result.csrfToken;subject=result.staff;applyCapabilities(result.capabilities,result.staff?.capabilities);event.target.reset();await authenticate();});});
 $('password-form').addEventListener('submit',(event)=>{event.preventDefault();void run(async()=>{const fields=Object.fromEntries(new FormData(event.target));await api('password',fields);event.target.reset();csrf='';subject=null;show('login');status('Password baru tersimpan. Masuk kembali dengan password baru.');});});
-$('logout').addEventListener('click',async()=>{const button=$('logout');button.disabled=true;try{await api('logout',{});resetReceiving();stopCamera();resetSelfie();clearInterval(attendance.timer);attendance.eligibility=null;attendance.location=null;csrf='';subject=null;home=null;$('profile-menu').hidden=true;$('profile-toggle').setAttribute('aria-expanded','false');show('login');status('Kamu sudah keluar.');}catch(error){status(error.message||'Belum berhasil keluar. Coba lagi.',true);}finally{button.disabled=false;}});
+$('logout').addEventListener('click',async()=>{const button=$('logout');button.disabled=true;try{await api('logout',{});resetReceiving();stopCamera();resetSelfie();clearInterval(attendance.timer);attendance.eligibility=null;attendance.location=null;csrf='';subject=null;home=null;clearRequestAttemptView();$('profile-menu').hidden=true;$('profile-toggle').setAttribute('aria-expanded','false');show('login');status('Kamu sudah keluar.');}catch(error){status(error.message||'Belum berhasil keluar. Coba lagi.',true);}finally{button.disabled=false;}});
 $('clock-in').addEventListener('click',()=>void clockAction('clock-in'));$('clock-out').addEventListener('click',()=>void clockAction('clock-out'));
 $('retry-location').addEventListener('click',()=>void getAttendanceCoordinates());
 $('attendance-correction').addEventListener('click',()=>{const schedule=attendance.eligibility?.schedule,kind=$('correction-kind').value,source=kind==='check_out'?schedule?.endAt:schedule?.startAt,date=source?new Date(source):serverNow();const parts=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Jakarta',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(date).replace(' ','T');$('correction-proposed-at').value=parts;$('attendance-correction-dialog').showModal();});$('close-correction').addEventListener('click',()=>$('attendance-correction-dialog').close());$('attendance-correction-form').addEventListener('submit',(event)=>void submitAttendanceCorrection(event));
@@ -269,6 +271,54 @@ function requestFeedback(message='',{field=null,danger=false,focus=false}={}) {
   else if(focus)feedback.focus();
 }
 function requestListFeedback(message,needsRefresh=false) { status('');$('request-list-feedback').textContent=message;$('request-list-feedback').hidden=!message;$('request-refresh-feedback').hidden=!needsRefresh; }
+function unresolvedRequest(){return requestController&&!['IDLE','COMMITTED','REJECTED'].includes(requestController.snapshot().state);}
+function fillPendingRequest(){
+  const input=requestController?.snapshot().attempt?.input;if(!input){$('request-form-title').textContent='Periksa pengiriman';$('request-form-subtitle').textContent='Pastikan status pengajuan lama sebelum melanjutkan.';return;}
+  $('request-category').value=input.category;updateRequestFields();
+  const localTime=value=>value?new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Jakarta',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value)).replace(' ','T'):'';
+  for(const [id,saved]of [['request-schedule',input.scheduleId],['swap-target',input.targetScheduleId]]){
+    const select=$(id);if(saved&&![...select.options].some(option=>option.value===saved)){const option=document.createElement('option');option.value=saved;option.textContent='Jadwal pengajuan tersimpan';select.append(option);}select.value=saved||'';
+  }
+  $('request-start').value=localTime(input.startAt);$('request-end').value=localTime(input.endAt);$('request-form').elements.reason.value=input.reason;
+}
+function renderRequestAttempt(snapshot){
+  const locked=!['IDLE','COMMITTED','REJECTED'].includes(snapshot.state),form=$('request-form');
+  form.classList.toggle('request-payload-missing',locked&&!snapshot.attempt?.input);
+  for(const control of form.querySelectorAll('input,select,textarea'))control.disabled=locked;
+  $('request-submit').disabled=locked;$('request-submit').hidden=locked;
+  $('request-recovery-actions').hidden=!locked;$('request-check-attempt').disabled=snapshot.busy||snapshot.state==='BLOCKED';
+  $('request-retry-attempt').hidden=snapshot.state!=='RETRY_READY';$('request-retry-attempt').disabled=snapshot.busy;
+  $('close-request-form').disabled=snapshot.busy;form.toggleAttribute('aria-busy',snapshot.busy);
+  if(snapshot.busy)form.setAttribute('aria-busy','true');
+  setIconText($('new-request'),locked?'Lanjutkan pengajuan tersimpan':'Buat pengajuan',locked?'file-text':'plus-circle',{leading:true});
+  const messages={SENDING:'Sedang mengirim. Tunggu konfirmasi; identitas pengajuan tersimpan untuk pemulihan.',CHECKING:'Memeriksa status pengiriman. Pengajuan tidak dikirim ulang.',UNCERTAIN:'Status pengiriman belum dapat dipastikan. Identitas pengajuan tersimpan; periksa status sebelum mencoba lagi.',RETRY_READY:'Pengajuan belum tercatat. Kamu dapat mengirim ulang pengajuan yang sama dengan aman.',DRAFT_MISSING:'Data formulir telah dihapus untuk privasi. Pengajuan belum tercatat; hubungi Owner untuk memastikan pengajuan lama sebelum membuat yang baru. Identitas pengiriman tetap tersimpan.',BLOCKED:'Penyimpanan pemulihan tidak tersedia atau tidak valid. Pengajuan tidak dikirim. Jangan hapus identitas pengajuan yang belum terkonfirmasi.'};
+  if(messages[snapshot.state]){requestFeedback(messages[snapshot.state],{danger:['UNCERTAIN','BLOCKED'].includes(snapshot.state)});requestListFeedback(messages[snapshot.state]);}
+}
+function initializeRequestAttempt(){
+  const actorId=subject?.staffId||subject?.id;if(!actorId)return;
+  if(requestActorId&&requestActorId!==actorId){$('request-form').reset();requestFeedback();requestListFeedback('');}
+  requestActorId=actorId;
+  let storage,drafts;try{storage=localStorage;drafts=sessionStorage;sanitizeRequestAttempts(storage);clearRequestDrafts(drafts,actorId);}catch{storage={getItem(){throw new Error('Storage unavailable');}};}
+  const controller=createRequestAttempt({actorId,storage,sessionStorage:drafts,onChange:snapshot=>{if(requestController===controller&&(subject?.staffId||subject?.id)===actorId)renderRequestAttempt(snapshot);},
+    submit:async input=>{try{return(await api('request',input)).data;}catch(error){error.definitiveRejection=requestRejectionCodes.has(error.code);throw error;}},
+    lookup:async key=>(await api(`request-operation?idempotencyKey=${encodeURIComponent(key)}`)).data});
+  requestController=controller;requestController.restore();if(unresolvedRequest())fillPendingRequest();
+}
+function clearRequestAttemptView(){
+  try{clearRequestDrafts(sessionStorage);requestController?.forgetDraft();sanitizeRequestAttempts(localStorage);}catch{}
+  const url=new URL(location.href);if(url.searchParams.get('view')==='requests'){url.searchParams.delete('screen');history.replaceState({view:'requests'},'',url);}
+  requestController=null;requestActorId=null;$('request-form').reset();requestFeedback();requestListFeedback('');
+  renderRequestAttempt({state:'IDLE',busy:false});
+}
+async function completeRequestAttempt(snapshot){
+  if(snapshot.state==='COMMITTED'){
+    $('request-form').reset();requestFeedback();closeRequestForm({force:true});requestListFeedback('Permohonan berhasil diajukan.');$('new-request').focus();
+    try{await refresh();requestListFeedback('Permohonan berhasil diajukan.');}catch{requestListFeedback('Permohonan sudah terkirim. Daftar belum dapat diperbarui; tidak perlu mengirim ulang.',true);}
+  }else if(snapshot.state==='REJECTED')requestFeedback(`${snapshot.error?.message||'Pengajuan ditolak.'} Data formulir tetap ada. Perbaiki sebelum mengirim lagi.`,{danger:true,focus:true});
+  else requestFeedback($('request-feedback').textContent,{danger:true,focus:true});
+}
+$('request-check-attempt').addEventListener('click',()=>void run(async()=>{const controller=requestController;if(controller){const result=await controller.check();if(requestController===controller)await completeRequestAttempt(result);}}));
+$('request-retry-attempt').addEventListener('click',()=>void run(async()=>{const controller=requestController;if(controller){const result=await controller.retry();if(requestController===controller)await completeRequestAttempt(result);}}));
 $('request-form').addEventListener('input',()=>requestFeedback());
 $('request-refresh-feedback').addEventListener('click',()=>void run(async()=>{
   const button=$('request-refresh-feedback');button.disabled=true;requestListFeedback('Memperbarui daftar pengajuan.',true);
@@ -278,6 +328,8 @@ $('request-refresh-feedback').addEventListener('click',()=>void run(async()=>{
 }));
 $('request-form').addEventListener('submit',(event)=>{
   event.preventDefault();void run(async()=>{
+    if(!requestController)initializeRequestAttempt();
+    if(unresolvedRequest()){renderRequestAttempt(requestController.snapshot());return;}
     const form=event.target,fields=Object.fromEntries(new FormData(form)),input={category:fields.category,reason:fields.reason,scheduleId:fields.scheduleId||null};
     requestFeedback();
     if(fields.category!=='shift_swap'){
@@ -290,20 +342,8 @@ $('request-form').addEventListener('submit',(event)=>{
       if(!input.scheduleId||!target){requestFeedback('Pilih jadwalmu dan shift rekan untuk tukar shift.',{field:input.scheduleId?$('swap-target'):$('request-schedule'),danger:true});return;}
       input.targetStaffId=target.staff_id;input.targetScheduleId=target.schedule_id;
     }
-    const controls=[...form.querySelectorAll('input,select,textarea,button'),$('close-request-form')],disabled=controls.map(control=>control.disabled);
-    form.setAttribute('aria-busy','true');controls.forEach(control=>control.disabled=true);setIconText($('request-submit'),'Mengirim pengajuan…');requestFeedback('Sedang mengirim. Tunggu konfirmasi; data formulir tetap ada.');
-    try{
-      await api('request',input);form.reset();requestFeedback();closeRequestForm({force:true});requestListFeedback('Permohonan berhasil diajukan.');$('new-request').focus();
-      try{await refresh();requestListFeedback('Permohonan berhasil diajukan.');}
-      catch(error){requestListFeedback('Permohonan sudah terkirim. Daftar belum dapat diperbarui; tidak perlu mengirim ulang.',true);}
-    }catch(error){
-      const uncertain=!error.status||error.status>=500;
-      const message=error.status?(error.message||'Pengajuan belum berhasil.'):'Koneksi belum dapat memastikan hasil pengiriman.';
-      requestFeedback(`${message} ${uncertain?'Status pengiriman belum dapat dipastikan. Kembali dan periksa daftar pengajuan sebelum mengirim ulang.':'Data formulir tetap ada selama halaman ini terbuka. Perbaiki atau coba lagi.'}`,{danger:true,focus:true});
-      if(error.status===401&&subject)await authenticate();
-    }finally{
-      form.removeAttribute('aria-busy');controls.forEach((control,index)=>control.disabled=disabled[index]);setIconText($('request-submit'),'Kirim pengajuan','arrow-right');
-    }
+    const controller=requestController,snapshot=await controller.start(input);
+    if(requestController===controller)await completeRequestAttempt(snapshot);
   });
 });
 $('receipt-supplier').addEventListener('input',markReceiptDirty);$('receipt-document').addEventListener('input',markReceiptDirty);$('receipt-note').addEventListener('input',markReceiptDirty);
